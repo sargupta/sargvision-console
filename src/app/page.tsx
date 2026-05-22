@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 
 import { AssetRail } from "@/components/AssetRail";
+import { BFTAlert } from "@/components/BFTAlert";
 import { CommsLog } from "@/components/CommsLog";
 import { Inspector } from "@/components/Inspector";
 import { SwarmMap } from "@/components/SwarmMap";
@@ -23,6 +24,7 @@ export default function ConsolePage() {
       <AssetRail />
       <Inspector />
       <CommsLog />
+      <BFTAlert />
     </main>
   );
 }

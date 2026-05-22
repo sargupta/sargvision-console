@@ -4,6 +4,7 @@ import { ShieldAlert, Wifi, WifiOff } from "lucide-react";
 
 import { cn } from "@/lib/cn";
 import { useSwarmStore } from "@/lib/store";
+import { MissionPicker } from "./MissionPicker";
 
 export function TopBar() {
   const connected = useSwarmStore((s) => s.connected);
@@ -12,28 +13,25 @@ export function TopBar() {
   const t = frame?.t ?? 0;
   const msgs = frame?.stats.total_msgs ?? 0;
   const mps = frame?.stats.msgs_per_s ?? 0;
-  const scenario = frame?.scenario ?? "—";
 
   return (
-    <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-center justify-between gap-3 border-b border-[var(--color-line)] bg-[var(--color-canvas)]/85 px-4 py-2 backdrop-blur-sm">
+    <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-center justify-between gap-3 border-b border-[var(--color-line)] bg-[var(--color-canvas)]/85 px-4 py-2 backdrop-blur-sm">
       <div className="flex items-center gap-3">
         <ShieldAlert
           className="h-5 w-5 text-[var(--color-friend)]"
           aria-hidden
         />
         <div className="font-mono text-[13px] tracking-[0.18em] text-[var(--color-text)]">
-          SARGVISION · SWARM CONSOLE
+          SARGVISION · SWARM
         </div>
-        <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-[var(--color-text-vdim)]">
-          ADITI 2.0 PS-11 · IAF Counter-Swarm
-        </div>
+        <span className="h-4 w-px bg-[var(--color-line)]" />
+        <MissionPicker />
       </div>
 
       <div className="flex items-center gap-5 font-mono text-[11px]">
-        <Stat label="SCENARIO" value={scenario.toUpperCase()} />
         <Stat label="T" value={`${t.toFixed(2)}s`} />
         <Stat label="N" value={n.toString().padStart(2, "0")} />
-        <Stat label="MSGS" value={msgs.toString()} />
+        <Stat label="MSGS" value={msgs.toLocaleString()} />
         <Stat label="MPS" value={mps.toFixed(0)} />
         <span
           className={cn(
