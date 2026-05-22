@@ -18,6 +18,7 @@ export function Inspector() {
       ? null
       : s.frame?.drones.find((d) => d.id === s.selectedDroneId) ?? null,
   );
+  const flags = useSwarmStore((s) => s.frame?.flags);
   const select = useSwarmStore((s) => s.select);
   const neighbors = useSwarmStore((s) => {
     if (s.selectedDroneId == null || !s.frame) return 0;
@@ -71,7 +72,14 @@ export function Inspector() {
               {drone.affiliation} · {drone.role} · {drone.healthy ? "NOMINAL" : "DEGRADED"}
             </div>
             <div className="mt-0.5 font-mono text-[9px] uppercase tracking-[0.18em] text-[var(--color-saffron)]">
-              NavIC + GPS · BSD-3 PX4 fork
+              {flags?.gnss_denied
+                ? "GNSS DENIED · CTU heightmap + Swarm-SLAM"
+                : "NavIC + GPS · BSD-3 PX4 fork"}
+            </div>
+            <div className="mt-0.5 font-mono text-[9px] uppercase tracking-[0.18em] text-[var(--color-text-vdim)]">
+              {flags?.jamming
+                ? "COMMS · null-steering ON · range halved"
+                : "COMMS · Zenoh mesh · 18m range"}
             </div>
           </div>
         </section>
