@@ -16,6 +16,8 @@ export interface DroneState {
   intent: string;
   affiliation: Affiliation;
   platform: string;       // e.g. "ALFA-S"
+  task?: string;          // human-readable task ("INTERCEPT KAM-1005")
+  intercept_target?: number | null;  // hostile.id this drone is chasing
 }
 
 export interface CommEdge {
@@ -53,12 +55,23 @@ export interface CBBAEvent {
 
 export interface Hostile {
   id: number;
+  callsign?: string;
   lon: number;
   lat: number;
   alt_m: number;
   alive: boolean;
   bearing_deg: number;
   intent: string;
+  assigned_to?: number | null;
+}
+
+export interface KillEvent {
+  t: number;
+  killer_id: number;
+  callsign: string;
+  lon: number;
+  lat: number;
+  alt_m: number;
 }
 
 export interface ThreatSummary {
@@ -79,6 +92,7 @@ export interface SwarmFrame {
   recent_messages: WireMessageEvent[];
   bft_events: BFTEvent[];
   cbba_events: CBBAEvent[];
+  kill_events?: KillEvent[];
   stats: {
     total_msgs: number;
     msgs_per_s: number;

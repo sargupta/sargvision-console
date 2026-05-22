@@ -112,8 +112,14 @@ function AssetRow({
           </span>
         </div>
         <div className="flex items-center justify-between gap-2 font-mono text-[10px] text-[var(--color-text-vdim)]">
-          <span className="truncate uppercase tracking-[0.15em]">
-            {drone.intent.replace(/_/g, " ")}
+          <span
+            className={cn(
+              "truncate uppercase tracking-[0.15em]",
+              drone.task?.startsWith("INTERCEPT") &&
+                "text-[var(--color-status-caution)]",
+            )}
+          >
+            {drone.task ?? drone.intent.replace(/_/g, " ")}
           </span>
           <span className="flex items-center gap-1">
             {battLow ? (
