@@ -6,6 +6,8 @@ import { useMemo } from "react";
 import { cn } from "@/lib/cn";
 import { useSwarmStore } from "@/lib/store";
 import type { DroneState, WireMessageEvent } from "@/lib/types";
+import { AlfaSilhouette } from "./AlfaSilhouette";
+import { IntentTimeline } from "./IntentTimeline";
 
 type RecentMsg = Pick<WireMessageEvent, "protocol" | "topic" | "summary" | "t">;
 const EMPTY_RECENT: RecentMsg[] = [];
@@ -58,8 +60,8 @@ export function Inspector() {
 
       <div className="scrollbar-hidden flex-1 overflow-y-auto px-3 py-3">
         <section className="mb-4 flex items-center gap-3">
-          <div className="grid h-14 w-14 place-items-center rounded-[2px] border border-[var(--color-friend)]/50 bg-[var(--color-friend)]/10">
-            <Plane className="h-7 w-7 text-[var(--color-friend)]" />
+          <div className="grid h-16 w-16 place-items-center rounded-[2px] border border-[var(--color-friend)]/50 bg-[var(--color-friend)]/10">
+            <AlfaSilhouette className="h-10 w-10 text-[var(--color-friend)]" />
           </div>
           <div className="flex flex-col">
             <div className="font-mono text-[15px] tracking-[0.12em] text-[var(--color-text)]">
@@ -67,6 +69,9 @@ export function Inspector() {
             </div>
             <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--color-text-vdim)]">
               {drone.affiliation} · {drone.role} · {drone.healthy ? "NOMINAL" : "DEGRADED"}
+            </div>
+            <div className="mt-0.5 font-mono text-[9px] uppercase tracking-[0.18em] text-[var(--color-saffron)]">
+              NavIC + GPS · BSD-3 PX4 fork
             </div>
           </div>
         </section>
@@ -106,9 +111,16 @@ export function Inspector() {
           <div className="mb-1 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--color-text-vdim)]">
             Current intent (LLM emitted)
           </div>
-          <div className="rounded-[2px] border border-[var(--color-friend)]/40 bg-[var(--color-friend)]/8 px-2 py-1.5 font-mono text-[12px] tracking-[0.06em] text-[var(--color-friend)]">
+          <div className="rounded-[2px] border border-[var(--color-friend)]/40 bg-[var(--color-friend)]/10 px-2 py-1.5 font-mono text-[12px] tracking-[0.06em] text-[var(--color-friend)]">
             {drone.intent.replace(/_/g, " ").toUpperCase()}
           </div>
+        </section>
+
+        <section className="mb-4">
+          <div className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--color-text-vdim)]">
+            Intent timeline (last 8 changes)
+          </div>
+          <IntentTimeline droneId={drone.id} />
         </section>
 
         <section>

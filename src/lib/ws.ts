@@ -2,6 +2,7 @@
 
 import { Unpackr } from "msgpackr";
 
+import { useIntentHistory } from "./history";
 import { useSwarmStore } from "./store";
 import type { SwarmFrame } from "./types";
 
@@ -27,10 +28,14 @@ export function connectSwarmWS(url: string): () => void {
           // Text frame fallback (JSON)
           const frame = JSON.parse(ev.data) as SwarmFrame;
           useSwarmStore.getState().setFrame(frame);
+          const pushIntent = useIntentHistory.getState().push;
+          for (const d of frame.drones) pushIntent(d.id, frame.t, d.intent);
           return;
         }
         const frame = unpackr.unpack(buf) as SwarmFrame;
         useSwarmStore.getState().setFrame(frame);
+        const pushIntent = useIntentHistory.getState().push;
+        for (const d of frame.drones) pushIntent(d.id, frame.t, d.intent);
       } catch (e) {
         console.error("WS unpack error", e);
       }
