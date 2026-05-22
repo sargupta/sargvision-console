@@ -2,6 +2,9 @@
 
 import { useEffect } from "react";
 
+import { AssetRail } from "@/components/AssetRail";
+import { CommsLog } from "@/components/CommsLog";
+import { Inspector } from "@/components/Inspector";
 import { SwarmMap } from "@/components/SwarmMap";
 import { TopBar } from "@/components/TopBar";
 import { connectSwarmWS } from "@/lib/ws";
@@ -17,6 +20,9 @@ export default function ConsolePage() {
     <main className="relative h-screen w-screen overflow-hidden bg-[var(--color-canvas)]">
       <SwarmMap />
       <TopBar />
+      <AssetRail />
+      <Inspector />
+      <CommsLog />
     </main>
   );
 }
