@@ -51,11 +51,30 @@ export interface CBBAEvent {
   bid_score: number;
 }
 
+export interface Hostile {
+  id: number;
+  lon: number;
+  lat: number;
+  alt_m: number;
+  alive: boolean;
+  bearing_deg: number;
+  intent: string;
+}
+
+export interface ThreatSummary {
+  total: number;
+  remaining: number;
+  neutralized: number;
+}
+
 export interface SwarmFrame {
   t: number;
   step: number;
   scenario: string;
   drones: DroneState[];
+  hostiles?: Hostile[];
+  threat?: ThreatSummary | null;
+  flags?: { jamming: boolean; gnss_denied: boolean };
   edges: CommEdge[];
   recent_messages: WireMessageEvent[];
   bft_events: BFTEvent[];

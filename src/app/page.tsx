@@ -7,6 +7,7 @@ import { BFTAlert } from "@/components/BFTAlert";
 import { CBBAPanel } from "@/components/CBBAPanel";
 import { CommsLog } from "@/components/CommsLog";
 import { Inspector } from "@/components/Inspector";
+import { MissionBriefing } from "@/components/MissionBriefing";
 import { SwarmMap } from "@/components/SwarmMap";
 import { TopBar } from "@/components/TopBar";
 import { connectSwarmWS } from "@/lib/ws";
@@ -27,6 +28,7 @@ export default function ConsolePage() {
       <CommsLog />
       <CBBAPanel />
       <BFTAlert />
+      <MissionBriefing />
     </main>
   );
 }

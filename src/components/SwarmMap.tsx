@@ -111,6 +111,60 @@ export function SwarmMap() {
       updateTriggers: { getSize: [selectedId], getIcon: [iconData.length] },
     });
 
+    // ── Hostile contacts (red NATO Hostile-UAV) ────────────────────
+    const hostileData = (frame.hostiles ?? [])
+      .filter((h) => h.alive)
+      .map((h) => {
+        const icon = getDroneIcon("hostile", "worker", 34);
+        return {
+          position: [h.lon, h.lat, h.alt_m] as [number, number, number],
+          icon,
+          hostile: h,
+        };
+      });
+    const hostileLayer = new IconLayer({
+      id: "hostiles",
+      data: hostileData,
+      pickable: false,
+      getIcon: (d: (typeof hostileData)[number]) => ({
+        url: d.icon.url,
+        width: d.icon.width,
+        height: d.icon.height,
+        anchorY: d.icon.height / 2,
+        mask: false,
+      }),
+      getPosition: (d) => d.position,
+      getSize: 38,
+      sizeMinPixels: 22,
+      sizeMaxPixels: 56,
+      updateTriggers: { getIcon: [hostileData.length] },
+    });
+
+    // Threat arrows: faint red line from each living hostile to swarm centroid
+    let centroid: [number, number, number] = [
+      DEFAULT_CENTER[0],
+      DEFAULT_CENTER[1],
+      0,
+    ];
+    if (frame.drones.length > 0) {
+      let lon = 0;
+      let lat = 0;
+      for (const d of frame.drones) {
+        lon += d.lon;
+        lat += d.lat;
+      }
+      centroid = [lon / frame.drones.length, lat / frame.drones.length, 0];
+    }
+    const threatLayer = new LineLayer({
+      id: "threat-vectors",
+      data: hostileData,
+      getSourcePosition: (d: (typeof hostileData)[number]) => d.position,
+      getTargetPosition: () => centroid,
+      getColor: [255, 77, 94, 90],
+      getWidth: 1,
+      widthUnits: "pixels",
+    });
+
     // ── 2. Selection halo (background highlight ring) ──────────────
     const selectedDrone = selectedId != null ? droneIndex.get(selectedId) : null;
     const haloLayer = selectedDrone
@@ -199,8 +253,8 @@ export function SwarmMap() {
       getHeight: 0.6,
     });
 
-    const layers = [edgeLayer, arcLayer, iconLayer];
-    if (haloLayer) layers.splice(2, 0, haloLayer);
+    const layers = [edgeLayer, threatLayer, arcLayer, hostileLayer, iconLayer];
+    if (haloLayer) layers.splice(4, 0, haloLayer);
     overlayRef.current.setProps({ layers });
   }, [frame, selectedId, select, droneIndex]);
 
