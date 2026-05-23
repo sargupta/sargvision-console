@@ -57,27 +57,39 @@ export function migrationLayers(mig: MigrationSummary | null | undefined): Layer
     data: zoneFillData,
     getPolygon: (d) => d.polygon,
     getFillColor: (d: (typeof zoneFillData)[number]) => {
+      if (d.zone.closed) {
+        // Closed pass = red X-hatched fill
+        return [255, 77, 94, 70];
+      }
       const [r, g, b] = d.color;
       const loadFrac = d.zone.capacity > 0 ? d.zone.occupancy / d.zone.capacity : 0;
-      // Light fill that intensifies with occupancy load
       const alpha = Math.round(20 + 35 * Math.min(1, loadFrac));
       return [r, g, b, alpha];
     },
-    getLineColor: (d: (typeof zoneFillData)[number]) => [...d.color, 170],
-    getLineWidth: 2,
+    getLineColor: (d: (typeof zoneFillData)[number]) =>
+      d.zone.closed ? [255, 77, 94, 240] : [...d.color, 170],
+    getLineWidth: (d: (typeof zoneFillData)[number]) => (d.zone.closed ? 3 : 2),
     lineWidthUnits: "pixels",
     stroked: true,
     filled: true,
-    updateTriggers: { getFillColor: [mig.zones.map((z) => z.occupancy).join(",")] },
+    updateTriggers: {
+      getFillColor: [mig.zones.map((z) => `${z.occupancy}/${z.closed}`).join(",")],
+      getLineColor: [mig.zones.map((z) => z.closed).join(",")],
+      getLineWidth: [mig.zones.map((z) => z.closed).join(",")],
+    },
   });
 
-  // Zone labels (name + occupancy/capacity)
+  // Zone labels (name + occupancy/capacity, "CLOSED" badge if shut)
   const zoneLabelLayer = new TextLayer({
     id: "mig-zone-labels",
     data: mig.zones,
     getPosition: (z) => [z.lon, z.lat, z.alt_m + 5],
-    getText: (z) => `${z.name}\n${z.occupancy}/${z.capacity}`,
+    getText: (z) =>
+      z.closed
+        ? `⛔ ${z.name}\nCLOSED`
+        : `${z.name}\n${z.occupancy}/${z.capacity}`,
     getColor: (z) => {
+      if (z.closed) return [255, 77, 94, 240];
       const [r, g, b] = hexToRgb(z.color);
       return [r, g, b, 240];
     },
