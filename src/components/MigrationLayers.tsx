@@ -10,7 +10,7 @@
  * Returned as a list of deck.gl layers the SwarmMap composes.
  */
 
-import { PolygonLayer, ScatterplotLayer, TextLayer } from "@deck.gl/layers";
+import { PathLayer, PolygonLayer, ScatterplotLayer, TextLayer } from "@deck.gl/layers";
 import type { Layer } from "@deck.gl/core";
 
 import type { MigrationSummary } from "@/lib/types";
@@ -140,5 +140,23 @@ export function migrationLayers(mig: MigrationSummary | null | undefined): Layer
     sizeUnits: "pixels",
   });
 
-  return [zoneFillLayer, hazardFillLayer, hazardCenterLayer, hazardLabelLayer, zoneLabelLayer];
+  // Drone trail streaks (Trilateral-style blue flow)
+  const trailData = (mig.trails ?? []).filter((t) => t.path.length >= 2);
+  const trailLayer = new PathLayer({
+    id: "mig-trails",
+    data: trailData,
+    getPath: (d) => d.path,
+    getColor: [0, 194, 255, 150],
+    getWidth: 1.5,
+    widthUnits: "pixels",
+  });
+
+  return [
+    zoneFillLayer,
+    hazardFillLayer,
+    hazardCenterLayer,
+    trailLayer,
+    hazardLabelLayer,
+    zoneLabelLayer,
+  ];
 }
