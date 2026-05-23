@@ -2,11 +2,13 @@
 
 export type Affiliation = "friend" | "hostile" | "neutral" | "unknown";
 export type Role = "worker" | "scout" | "relay" | "leader";
+export type ShieldClass = "loyal" | "suspect" | "hijacked" | "kill_switched";
+export type ThreatClass = "decoy" | "kinetic" | "nuisance" | "unknown";
 
 export interface DroneState {
   id: number;
-  lon: number;            // mapped from sim x → longitude
-  lat: number;            // mapped from sim y → latitude
+  lon: number;
+  lat: number;
   alt_m: number;
   vel_ms: number;
   heading_deg: number;
@@ -15,15 +17,19 @@ export interface DroneState {
   role: Role;
   intent: string;
   affiliation: Affiliation;
-  platform: string;       // e.g. "ALFA-S"
-  task?: string;          // human-readable task ("INTERCEPT KAM-1005")
-  intercept_target?: number | null;  // hostile.id this drone is chasing
+  platform: string;
+  task?: string;
+  intercept_target?: number | null;
+  // SHIELD per-drone state (loyalty + trust + class)
+  loyalty?: number;            // 0..1, sheaf-Laplacian residual
+  trust?: number;              // 0..1, PageRank-damped
+  shield_class?: ShieldClass;
 }
 
 export interface CommEdge {
   src: number;
   dst: number;
-  strength: number;       // 0..1
+  strength: number;
 }
 
 export interface WireMessageEvent {
@@ -63,6 +69,9 @@ export interface Hostile {
   bearing_deg: number;
   intent: string;
   assigned_to?: number | null;
+  // SHIELD per-hostile classification
+  threat_class?: ThreatClass | null;
+  posterior?: number[] | null;  // [P(decoy), P(kinetic), P(nuisance)]
 }
 
 export interface KillEvent {
@@ -80,6 +89,18 @@ export interface ThreatSummary {
   neutralized: number;
 }
 
+/** SHIELD aggregate state — drives the SHIELD panel + TopBar chip. */
+export interface ShieldSummary {
+  loyal: number;
+  suspect: number;
+  hijacked: number;
+  kill_switched: number;
+  decoys_skipped: number;     // decoys SHIELD refused to engage (saved munition)
+  trust_kill_threshold: number;
+  threat_mix: Partial<Record<ThreatClass, number>>;
+  hijack_active: boolean;
+}
+
 export interface SwarmFrame {
   t: number;
   step: number;
@@ -87,7 +108,8 @@ export interface SwarmFrame {
   drones: DroneState[];
   hostiles?: Hostile[];
   threat?: ThreatSummary | null;
-  flags?: { jamming: boolean; gnss_denied: boolean };
+  shield?: ShieldSummary | null;
+  flags?: { jamming: boolean; gnss_denied: boolean; hijack_active?: boolean };
   edges: CommEdge[];
   recent_messages: WireMessageEvent[];
   bft_events: BFTEvent[];
