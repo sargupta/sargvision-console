@@ -7,8 +7,10 @@ import { BFTAlert } from "@/components/BFTAlert";
 import { CBBAPanel } from "@/components/CBBAPanel";
 import { CommsLog } from "@/components/CommsLog";
 import { DoctrinePanel } from "@/components/DoctrinePanel";
+import { EngagementTimeline } from "@/components/EngagementTimeline";
 import { Inspector } from "@/components/Inspector";
 import { MissionBriefing } from "@/components/MissionBriefing";
+import { MissionObjectives } from "@/components/MissionObjectives";
 import { ShieldPanel } from "@/components/ShieldPanel";
 import { SwarmMap } from "@/components/SwarmMap";
 import { TopBar } from "@/components/TopBar";
@@ -30,6 +32,8 @@ export default function ConsolePage() {
       <CommsLog />
       <CBBAPanel />
       <ShieldPanel />
+      <EngagementTimeline />
+      <MissionObjectives />
       <BFTAlert />
       <MissionBriefing />
       <DoctrinePanel />
