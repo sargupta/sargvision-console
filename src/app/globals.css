@@ -1,26 +1,65 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* ── SARGVISION defense palette ─────────────────────────────────── */
+  --color-canvas: #07090C;
+  --color-surface: #0E1218;
+  --color-elevated: #161B23;
+  --color-line: #1F2937;
+
+  --color-text: #E6EBF2;
+  --color-text-dim: #94A3B8;
+  --color-text-vdim: #475569;
+
+  --color-friend: #00C2FF;
+  --color-hostile: #FF4D5E;
+  --color-neutral: #A78BFA;
+  --color-unknown: #FFC83D;
+
+  --color-status-ok: #4AE6A0;
+  --color-status-caution: #FFC83D;
+  --color-status-warn: #FF8A1F;
+  --color-status-crit: #FF4D5E;
+
+  --color-saffron: #FF8A1F;
+
+  --font-sans: "Inter", "InterVariable", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Berkeley Mono", ui-monospace, monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html, body {
+  background: var(--color-canvas);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv11";
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  overflow: hidden;
 }
+
+#__next, main {
+  height: 100%;
+  width: 100%;
+}
+
+.maplibregl-canvas { outline: none !important; }
+.maplibregl-ctrl-attrib {
+  background: rgba(7, 9, 12, 0.7) !important;
+  color: var(--color-text-vdim) !important;
+  font-size: 10px !important;
+}
+.maplibregl-ctrl-attrib a { color: var(--color-text-dim) !important; }
+
+.mono, code, .num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum", "zero";
+}
+
+.scrollbar-hidden::-webkit-scrollbar { display: none; }
+.scrollbar-hidden { -ms-overflow-style: none; scrollbar-width: none; }
