@@ -4,6 +4,7 @@ import { Unpackr } from "msgpackr";
 
 import { useEngagementLog } from "./engagement";
 import { useIntentHistory } from "./history";
+import { useReplay } from "./replay";
 import { useSwarmStore } from "./store";
 import type { SwarmFrame } from "./types";
 
@@ -29,6 +30,7 @@ export function connectSwarmWS(url: string): () => void {
           // Text frame fallback (JSON)
           const frame = JSON.parse(ev.data) as SwarmFrame;
           useSwarmStore.getState().setFrame(frame);
+          useReplay.getState().push(frame);
           const pushIntent = useIntentHistory.getState().push;
           for (const d of frame.drones) pushIntent(d.id, frame.t, d.intent);
           useEngagementLog.getState().ingest(frame);
@@ -36,6 +38,7 @@ export function connectSwarmWS(url: string): () => void {
         }
         const frame = unpackr.unpack(buf) as SwarmFrame;
         useSwarmStore.getState().setFrame(frame);
+        useReplay.getState().push(frame);
         const pushIntent = useIntentHistory.getState().push;
         for (const d of frame.drones) pushIntent(d.id, frame.t, d.intent);
         useEngagementLog.getState().ingest(frame);

@@ -1,12 +1,13 @@
-/** Zustand store — holds the most recent swarm frame + UI selection state. */
+/** Zustand store — most recent swarm frame, UI selection, replay override. */
 
 import { create } from "zustand";
 
+import { useReplay } from "./replay";
 import type { SwarmFrame } from "./types";
 
 interface SwarmStore {
   connected: boolean;
-  frame: SwarmFrame | null;
+  _liveFrame: SwarmFrame | null;
   selectedDroneId: number | null;
   setConnected: (c: boolean) => void;
   setFrame: (f: SwarmFrame) => void;
@@ -14,12 +15,35 @@ interface SwarmStore {
   reset: () => void;
 }
 
-export const useSwarmStore = create<SwarmStore>((set) => ({
+const _store = create<SwarmStore>((set) => ({
   connected: false,
-  frame: null,
+  _liveFrame: null,
   selectedDroneId: null,
   setConnected: (connected) => set({ connected }),
-  setFrame: (frame) => set({ frame }),
+  setFrame: (frame) => set({ _liveFrame: frame }),
   select: (selectedDroneId) => set({ selectedDroneId }),
-  reset: () => set({ frame: null, selectedDroneId: null }),
+  reset: () => set({ _liveFrame: null, selectedDroneId: null }),
 }));
+
+// Public hook that returns the scrubbed frame if replay is active, else live.
+export const useSwarmStore: typeof _store = ((selector?: any, equality?: any) => {
+  if (!selector) return _store();
+  const wrapped = (state: SwarmStore) => {
+    const replayState = useReplay.getState();
+    const effectiveFrame = replayState.scrubbed ?? state._liveFrame;
+    return selector({ ...state, frame: effectiveFrame } as SwarmStore & { frame: SwarmFrame | null });
+  };
+  return _store(wrapped, equality);
+}) as typeof _store;
+
+Object.assign(useSwarmStore, {
+  getState: () => {
+    const s = _store.getState();
+    const replayState = useReplay.getState();
+    const effectiveFrame = replayState.scrubbed ?? s._liveFrame;
+    return { ...s, frame: effectiveFrame };
+  },
+  setState: _store.setState.bind(_store),
+  subscribe: _store.subscribe.bind(_store),
+  destroy: (_store as any).destroy?.bind(_store),
+});

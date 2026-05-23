@@ -6,11 +6,15 @@ import { AssetRail } from "@/components/AssetRail";
 import { BFTAlert } from "@/components/BFTAlert";
 import { CBBAPanel } from "@/components/CBBAPanel";
 import { CommsLog } from "@/components/CommsLog";
+import { DegradedOpsBanner } from "@/components/DegradedOpsBanner";
 import { DoctrinePanel } from "@/components/DoctrinePanel";
 import { EngagementTimeline } from "@/components/EngagementTimeline";
 import { Inspector } from "@/components/Inspector";
+import { MigrationStats } from "@/components/MigrationStats";
 import { MissionBriefing } from "@/components/MissionBriefing";
 import { MissionObjectives } from "@/components/MissionObjectives";
+import { PostMortem } from "@/components/PostMortem";
+import { ReplayScrubber } from "@/components/ReplayScrubber";
 import { ShieldPanel } from "@/components/ShieldPanel";
 import { SwarmMap } from "@/components/SwarmMap";
 import { TopBar } from "@/components/TopBar";
@@ -34,10 +38,14 @@ export default function ConsolePage() {
       <CBBAPanel />
       <ShieldPanel />
       <VajraPanel />
+      <MigrationStats />
       <EngagementTimeline />
       <MissionObjectives />
       <BFTAlert />
+      <DegradedOpsBanner />
+      <ReplayScrubber />
       <MissionBriefing />
+      <PostMortem />
       <DoctrinePanel />
     </main>
   );
