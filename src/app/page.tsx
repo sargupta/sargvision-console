@@ -6,6 +6,7 @@ import { AssetRail } from "@/components/AssetRail";
 import { BFTAlert } from "@/components/BFTAlert";
 import { CBBAPanel } from "@/components/CBBAPanel";
 import { CommsLog } from "@/components/CommsLog";
+import { DoctrinePanel } from "@/components/DoctrinePanel";
 import { Inspector } from "@/components/Inspector";
 import { MissionBriefing } from "@/components/MissionBriefing";
 import { ShieldPanel } from "@/components/ShieldPanel";
@@ -31,6 +32,7 @@ export default function ConsolePage() {
       <ShieldPanel />
       <BFTAlert />
       <MissionBriefing />
+      <DoctrinePanel />
     </main>
   );
 }
