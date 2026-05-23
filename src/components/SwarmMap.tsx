@@ -15,6 +15,7 @@ import {
 } from "@/lib/drone-glyphs";
 import { useSwarmStore } from "@/lib/store";
 import { BasemapSwitcher } from "./BasemapSwitcher";
+import { migrationLayers } from "./MigrationLayers";
 
 const DEFAULT_CENTER: [number, number] = [77.5770, 34.1526];
 const DEFAULT_ZOOM = 13.2;
@@ -441,7 +442,11 @@ export function SwarmMap() {
       getHeight: 0.6,
     });
 
+    // Governed Migration zone + hazard layers (under everything tactical).
+    const migLayers = migrationLayers(frame.migration);
+
     const layers = [
+      ...migLayers,
       edgeLayer,
       threatLayer,
       arcLayer,
@@ -454,7 +459,7 @@ export function SwarmMap() {
       killLayer,
       killLabelLayer,
     ];
-    if (haloLayer) layers.splice(7, 0, haloLayer);
+    if (haloLayer) layers.splice(7 + migLayers.length, 0, haloLayer);
     overlayRef.current.setProps({ layers });
   }, [frame, selectedId, select, droneIndex]);
 

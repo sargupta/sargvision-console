@@ -46,6 +46,16 @@ export const MISSIONS: Mission[] = [
       "Ship-launched mesh forms inner+outer ring around carrier group. Saturation strike intercept + sonobuoy scouts.",
   },
   {
+    id: "migration",
+    short: "MIGRATE-LAC",
+    title: "Governed Migration · Leh → LAC",
+    service: "ARMY",
+    idex_ref: "DISC-14 PS-16",
+    ticket_inr_cr: 11.5,
+    brief:
+      "100 drones flow Leh airbase → Nubra forward post via Khardung La / Zoji La / Tanglang La. Per-corridor capacity, glacier-storm avoidance, governance-style load balancing.",
+  },
+  {
     id: "hover",
     short: "HOLD",
     title: "Hold Station",
