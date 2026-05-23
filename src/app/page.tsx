@@ -14,6 +14,7 @@ import { MissionObjectives } from "@/components/MissionObjectives";
 import { ShieldPanel } from "@/components/ShieldPanel";
 import { SwarmMap } from "@/components/SwarmMap";
 import { TopBar } from "@/components/TopBar";
+import { VajraPanel } from "@/components/VajraPanel";
 import { connectSwarmWS } from "@/lib/ws";
 
 const WS_URL = process.env.NEXT_PUBLIC_SWARM_WS_URL ?? "ws://127.0.0.1:8765/swarm";
@@ -32,6 +33,7 @@ export default function ConsolePage() {
       <CommsLog />
       <CBBAPanel />
       <ShieldPanel />
+      <VajraPanel />
       <EngagementTimeline />
       <MissionObjectives />
       <BFTAlert />

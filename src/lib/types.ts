@@ -89,6 +89,21 @@ export interface ThreatSummary {
   neutralized: number;
 }
 
+/** Vajra (वज्र) — strike-coordination doctrine.
+ * Voronoi hysteresis + algebraic connectivity (Fiedler λ₂) + break-even.
+ */
+export interface VajraSummary {
+  lambda2: number;                 // Fiedler value of comm-graph Laplacian
+  n_components: number;            // 1 = connected; >1 = fragmented
+  fragmented: boolean;             // λ₂ < threshold → alarm fires
+  fragmentation_threshold: number;
+  jamming_factor: number;          // 0..1
+  voronoi_owners: Record<number, number>;  // hostile_id → friendly_id
+  handover_count: number;
+  n_friendlies: number;
+  n_hostiles_alive: number;
+}
+
 /** SHIELD aggregate state — drives the SHIELD panel + TopBar chip. */
 export interface ShieldSummary {
   loyal: number;
@@ -109,6 +124,7 @@ export interface SwarmFrame {
   hostiles?: Hostile[];
   threat?: ThreatSummary | null;
   shield?: ShieldSummary | null;
+  vajra?: VajraSummary | null;
   flags?: { jamming: boolean; gnss_denied: boolean; hijack_active?: boolean };
   edges: CommEdge[];
   recent_messages: WireMessageEvent[];
