@@ -323,22 +323,33 @@ export function SwarmMap() {
       sizeUnits: "pixels",
     });
 
-    // ── Per-drone task labels (small, under each drone) ──────────────
+    // ── Per-drone task labels — only show high-signal labels so the map
+    //    isn't carpeted with repeated STATION HOLD / PATROL PERIMETER text.
+    //    Always show INTERCEPT (active engagement), COMMAND ELEMENT (single
+    //    leader), and tasks for the currently-selected drone.
+    const taskLabelData = frame.drones.filter((d) => {
+      if (selectedId === d.id) return true;
+      if (d.task?.startsWith("INTERCEPT")) return true;
+      if (d.task === "COMMAND ELEMENT") return true;
+      return false;
+    });
     const taskLabelLayer = new TextLayer({
       id: "drone-tasks",
-      data: frame.drones,
+      data: taskLabelData,
       getPosition: (d) => [d.lon, d.lat, d.alt_m],
       getText: (d) => d.task ?? "",
       getColor: (d) => {
-        if (d.task?.startsWith("INTERCEPT")) return [255, 200, 60, 220];
-        if (d.task === "COMMAND ELEMENT") return [255, 138, 31, 200];
-        if (d.task === "PATROL PERIMETER") return [74, 230, 160, 200];
-        if (d.task === "RELAY LINK") return [255, 200, 61, 200];
-        return [148, 163, 184, 180];
+        if (d.task?.startsWith("INTERCEPT")) return [255, 200, 60, 230];
+        if (d.task === "COMMAND ELEMENT") return [255, 138, 31, 220];
+        return [148, 163, 184, 200];
       },
-      getSize: 9.5,
+      getSize: 10,
       getPixelOffset: [0, 30],
       fontFamily: "JetBrains Mono, ui-monospace, monospace",
+      fontWeight: 600,
+      background: true,
+      getBackgroundColor: [10, 14, 20, 200],
+      backgroundPadding: [3, 1, 3, 1],
       sizeUnits: "pixels",
     });
 

@@ -180,6 +180,20 @@ export const DOCTRINES: Doctrine[] = [
       "When Chinese spoofers blanket the LAC, GPS is meaningless. Drones fall back to terrain-relative navigation by gradient-matching against onboard heightmap.",
   },
 
+  // ── Strike / formation resilience ──
+  {
+    sanskrit: "वज्र",
+    transliteration: "Vajra",
+    meaning: "Indra's thunderbolt — coordinated, decisive strike that doesn't shatter on impact",
+    technical: "Voronoi-hysteresis + algebraic-connectivity + break-even strike doctrine",
+    layer: "allocation",
+    math: "λ₂(L_swarm) ≥ τ_frag ⟹ vajra_assign(targets, k* = break-even interceptors)",
+    citation: "own — fragmentation alarm via Fiedler value of Laplacian; Voronoi hysteresis kills assignment thrash",
+    surfaced_in: "(Phase J+) — fragmentation alarm in TopBar · engagement coordination quality",
+    notes:
+      "Vajra holds the swarm together under contact. Algebraic connectivity (Fiedler value of the comm-graph Laplacian) measures network resilience; below threshold = fragmentation alarm fires. Voronoi hysteresis prevents assignment thrashing when adjacent interceptors swap targets. Break-even computes the minimum interceptors needed for a credible strike against k hostiles.",
+  },
+
   // ── EW ──
   {
     sanskrit: "रवि-निरोध",

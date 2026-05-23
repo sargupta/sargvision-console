@@ -7,7 +7,7 @@ import { cn } from "@/lib/cn";
 import { useSwarmStore } from "@/lib/store";
 import type { BFTEvent } from "@/lib/types";
 
-const TTL_MS = 7000;
+const TTL_MS = 4500;
 
 export function BFTAlert() {
   const events = useSwarmStore((s) => s.frame?.bft_events);

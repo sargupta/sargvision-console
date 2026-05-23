@@ -26,7 +26,7 @@ export function MissionObjectives() {
   const allDown = total > 0 && remaining === 0;
 
   return (
-    <section className="pointer-events-auto absolute left-1/2 top-12 z-30 -translate-x-1/2 flex w-[460px] flex-col gap-1 rounded-[2px] border border-[var(--color-saffron)]/35 bg-[var(--color-canvas)]/95 px-3 py-2 font-mono text-[10.5px] backdrop-blur-sm">
+    <section className="pointer-events-auto absolute left-72 top-12 z-20 flex w-[400px] flex-col gap-1 rounded-[2px] border border-[var(--color-saffron)]/35 bg-[var(--color-canvas)]/95 px-3 py-2 font-mono text-[10.5px] backdrop-blur-sm">
       <header className="flex items-baseline justify-between border-b border-[var(--color-line)] pb-1.5">
         <span className="inline-flex items-center gap-1.5 uppercase tracking-[0.18em] text-[var(--color-saffron)]">
           <Crosshair className="h-3 w-3" />
