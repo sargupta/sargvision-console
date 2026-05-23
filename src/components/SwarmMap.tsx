@@ -2,7 +2,7 @@
 
 import "maplibre-gl/dist/maplibre-gl.css";
 
-import { ArcLayer, IconLayer, LineLayer, TextLayer } from "@deck.gl/layers";
+import { ArcLayer, ColumnLayer, IconLayer, LineLayer, TextLayer } from "@deck.gl/layers";
 import { MapboxOverlay } from "@deck.gl/mapbox";
 import maplibregl from "maplibre-gl";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -45,8 +45,9 @@ export function SwarmMap() {
       style: BASEMAPS.satellite.style,
       center: DEFAULT_CENTER,
       zoom: DEFAULT_ZOOM,
-      pitch: 40,
-      bearing: -12,
+      pitch: 58,
+      bearing: -16,
+      maxPitch: 75,
       attributionControl: { compact: true },
     });
     map.addControl(
@@ -129,6 +130,48 @@ export function SwarmMap() {
         getSize: [selectedId],
         getAngle: [frame.step],
         getIcon: [iconData.length],
+      },
+    });
+
+    // ── 3D drone columns — vertical hover-stalks colored by role/shield ──
+    const ROLE_COLOR_RGB: Record<string, [number, number, number]> = {
+      worker: [0, 194, 255],
+      scout: [74, 230, 160],
+      relay: [255, 200, 61],
+      leader: [255, 138, 31],
+    };
+    const SHIELD_OVERRIDE: Record<string, [number, number, number] | undefined> = {
+      hijacked: [255, 77, 94],
+      kill_switched: [120, 120, 120],
+      suspect: [255, 200, 61],
+    };
+    const columnData = frame.drones.map((d) => {
+      const sc = d.shield_class ?? "loyal";
+      const color =
+        SHIELD_OVERRIDE[sc] ?? ROLE_COLOR_RGB[d.role] ?? [0, 194, 255];
+      return {
+        position: [d.lon, d.lat] as [number, number],
+        color,
+        height: Math.max(40, d.alt_m * 60),  // sim alt 6m × 60 → 360m column visible at zoom 13
+        drone: d,
+      };
+    });
+    const columnLayer = new ColumnLayer({
+      id: "drone-columns",
+      data: columnData,
+      diskResolution: 16,
+      radius: 8,
+      radiusUnits: "pixels",
+      extruded: true,
+      pickable: false,
+      elevationScale: 1,
+      getPosition: (d) => d.position,
+      getElevation: (d) => d.height,
+      getFillColor: (d) => [...d.color, 180] as [number, number, number, number],
+      getLineColor: [10, 14, 20, 230],
+      updateTriggers: {
+        getElevation: [frame.step],
+        getFillColor: [frame.drones.map((d) => d.shield_class ?? "loyal").join(",")],
       },
     });
 
@@ -451,6 +494,7 @@ export function SwarmMap() {
       threatLayer,
       arcLayer,
       engagementArcLayer,
+      columnLayer,           // 3D vertical stalks beneath the icons
       hostileLayer,
       hostileLabelLayer,
       headingArrowLayer,
@@ -459,7 +503,7 @@ export function SwarmMap() {
       killLayer,
       killLabelLayer,
     ];
-    if (haloLayer) layers.splice(7 + migLayers.length, 0, haloLayer);
+    if (haloLayer) layers.splice(8 + migLayers.length, 0, haloLayer);
     overlayRef.current.setProps({ layers });
   }, [frame, selectedId, select, droneIndex]);
 
