@@ -31,8 +31,9 @@ export function RightDock({
 }) {
   return (
     <aside
-      className="pointer-events-auto absolute right-0 top-12 z-10 flex w-[26rem] flex-col border-l border-[var(--color-line)] bg-[var(--color-canvas)]/95 backdrop-blur-sm"
+      className="pointer-events-auto absolute right-0 top-12 z-10 hidden md:flex w-[26rem] flex-col border-l border-[var(--color-line)] bg-[var(--color-canvas)]/95 backdrop-blur-sm"
       style={{ height: "calc(100vh - 3rem)" }}
+      data-mobile-panel="dock"
     >
       {/* Top: mission objectives. Empty when scenario has no defined brief. */}
       <div className="shrink-0 empty:hidden border-b border-[var(--color-line)] empty:border-b-0">

@@ -20,7 +20,7 @@ export function ReplayScrubber() {
   const tAt = frame.t;
 
   return (
-    <div className="pointer-events-auto absolute bottom-1 left-1/2 z-30 flex w-[640px] -translate-x-1/2 items-center gap-2 rounded-[2px] border border-[var(--color-line)] bg-[var(--color-canvas)]/95 px-3 py-1 font-mono text-[10px] backdrop-blur-sm">
+    <div className="pointer-events-auto absolute bottom-1 left-1/2 z-30 flex w-[calc(100vw-1.5rem)] max-w-[640px] -translate-x-1/2 items-center gap-2 rounded-[2px] border border-[var(--color-line)] bg-[var(--color-canvas)]/95 px-3 py-1 font-mono text-[10px] backdrop-blur-sm">
       <button
         type="button"
         onClick={() => scrubTo(live ? buffer.length - 2 : null)}

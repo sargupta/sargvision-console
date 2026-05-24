@@ -45,7 +45,7 @@ export function AssetRail() {
   }, [drones]);
 
   return (
-    <aside className="pointer-events-auto absolute left-0 top-12 z-10 flex h-[calc(100vh-3.5rem)] w-72 flex-col border-r border-[var(--color-line)] bg-[var(--color-canvas)]/92 backdrop-blur-sm">
+    <aside className="pointer-events-auto absolute left-0 top-12 z-10 hidden md:flex h-[calc(100vh-3.5rem)] w-72 flex-col border-r border-[var(--color-line)] bg-[var(--color-canvas)]/92 backdrop-blur-sm" data-mobile-panel="assets">
       <header className="border-b border-[var(--color-line)] px-3 py-2 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--color-text-vdim)]">
         <div className="flex items-center justify-between">
           <span>Assets · {drones.length.toString().padStart(2, "0")}</span>

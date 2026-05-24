@@ -9,6 +9,7 @@ import { DegradedOpsBanner } from "@/components/DegradedOpsBanner";
 import { DoctrinePanel } from "@/components/DoctrinePanel";
 import { MissionBriefing } from "@/components/MissionBriefing";
 import { MissionObjectives } from "@/components/MissionObjectives";
+import { MobileShell } from "@/components/MobileShell";
 import { PostMortem } from "@/components/PostMortem";
 import { ReplayScrubber } from "@/components/ReplayScrubber";
 import { RightDock } from "@/components/RightDock";
@@ -57,8 +58,23 @@ export default function ConsolePage() {
         alert={<BFTAlert />}
       />
 
-      {/* Bottom edge — wire log strip (between left rail and right dock) */}
+      {/* Bottom edge — wire log strip (between left rail and right dock).
+          Hidden below md: breakpoint; accessible on mobile via MobileShell. */}
       <CommsLog />
+
+      {/* Mobile-only: 3 FABs at bottom-right that open AssetRail / RightDock
+          / CommsLog as bottom-sheet drawers. Above md: renders nothing. */}
+      <MobileShell
+        assets={<AssetRail />}
+        dock={
+          <RightDock
+            mission={<MissionObjectives />}
+            doctrine={<RightTabPanel />}
+            alert={<BFTAlert />}
+          />
+        }
+        wirelog={<CommsLog />}
+      />
 
       {/* Floating overlays — appear conditionally */}
       <DegradedOpsBanner />

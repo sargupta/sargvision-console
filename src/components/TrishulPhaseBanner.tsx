@@ -31,7 +31,7 @@ export function TrishulPhaseBanner() {
   const underAttackCount = trishul.hvts.filter((h) => h.status === "UNDER_ATTACK").length;
 
   return (
-    <div className="pointer-events-none absolute bottom-12 left-1/2 z-30 w-[680px] -translate-x-1/2 font-mono">
+    <div className="pointer-events-none absolute bottom-32 md:bottom-12 left-1/2 z-30 w-[calc(100vw-1rem)] max-w-[680px] -translate-x-1/2 font-mono">
       <div
         className="overflow-hidden rounded-[2px] border bg-[var(--color-canvas)]/95 backdrop-blur-sm"
         style={{ borderColor: `${color}66` }}
