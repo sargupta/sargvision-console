@@ -6,6 +6,7 @@ import { useState } from "react";
 import { cn } from "@/lib/cn";
 import { useSwarmStore } from "@/lib/store";
 import { MissionPicker } from "./MissionPicker";
+import { VyuhaSelector } from "./VyuhaSelector";
 
 const HTTP_URL = process.env.NEXT_PUBLIC_SWARM_HTTP_URL ?? "http://127.0.0.1:8765";
 
@@ -40,7 +41,7 @@ export function TopBar() {
   }
 
   return (
-    <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-center justify-between gap-3 border-b border-[var(--color-line)] bg-[var(--color-canvas)]/85 px-4 py-2 backdrop-blur-sm">
+    <div className="pointer-events-none absolute inset-x-0 top-0 z-40 flex items-center justify-between gap-3 border-b border-[var(--color-line)] bg-[var(--color-canvas)]/85 px-4 py-2 backdrop-blur-sm">
       <div className="flex items-center gap-3">
         <ShieldAlert className="h-5 w-5 text-[var(--color-friend)]" aria-hidden />
         <div className="font-mono text-[13px] tracking-[0.18em] text-[var(--color-text)]">
@@ -48,6 +49,7 @@ export function TopBar() {
         </div>
         <span className="h-4 w-px bg-[var(--color-line)]" />
         <MissionPicker />
+        <VyuhaSelector />
         {threat && (
           <span className="pointer-events-auto inline-flex items-center gap-1.5 rounded-[2px] border border-[var(--color-hostile)]/40 bg-[var(--color-hostile)]/8 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--color-hostile)]">
             <Crosshair className="h-3 w-3" />
@@ -55,7 +57,10 @@ export function TopBar() {
             <span className="tabular-nums text-[var(--color-text)]">
               {String(threat.remaining).padStart(2, "0")}/{String(threat.total).padStart(2, "0")}
             </span>
-            <span className="text-[var(--color-status-ok)]">· KIA {threat.neutralized}</span>
+            <span className="text-[var(--color-status-ok)]">· INT {threat.neutralized}</span>
+            {(threat.impacted ?? 0) > 0 && (
+              <span className="text-[var(--color-status-crit)]">· LEAK {threat.impacted}</span>
+            )}
           </span>
         )}
       </div>

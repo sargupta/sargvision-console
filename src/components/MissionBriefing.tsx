@@ -6,18 +6,26 @@ import { cn } from "@/lib/cn";
 import { MISSIONS } from "@/lib/missions";
 import { useSwarmStore } from "@/lib/store";
 
-const HOLD_MS = 4200;
+const HOLD_MS = 2800;
 
 export function MissionBriefing() {
   const scenario = useSwarmStore((s) => s.frame?.scenario);
   const [visible, setVisible] = useState(false);
   const [current, setCurrent] = useState<string | null>(null);
   const lastShownRef = useRef<string | null>(null);
+  const sawFirstRef = useRef(false);
   const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!scenario || scenario === lastShownRef.current) return;
     lastShownRef.current = scenario;
+    // Skip the very first scenario announcement — user is still parsing the UI,
+    // doesn't need a full-screen modal on connect. Only show on actual transitions.
+    if (!sawFirstRef.current) {
+      sawFirstRef.current = true;
+      setCurrent(scenario);
+      return;
+    }
     setCurrent(scenario);
     setVisible(true);
     if (timerRef.current) window.clearTimeout(timerRef.current);
@@ -25,14 +33,15 @@ export function MissionBriefing() {
   }, [scenario]);
 
   const mission = MISSIONS.find((m) => m.id === current);
-  if (!mission) return null;
+  if (!mission || !visible) return null;
 
   return (
     <div
       className={cn(
-        "pointer-events-none fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300",
+        "pointer-events-auto fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300",
         visible ? "opacity-100" : "opacity-0",
       )}
+      onClick={() => setVisible(false)}
     >
       <div className="absolute inset-0 bg-[var(--color-canvas)]/60 backdrop-blur-sm" />
       <div

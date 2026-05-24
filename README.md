@@ -1,126 +1,93 @@
 # SARGVISION Swarm Console
 
-**Indian-stack EW-survivable counter-swarm command console.**
-Targeting iDEX **ADITI 2.0 PS-11** (₹25 cr — IAF Counter-Swarm), **DISC-14 PS-21** (Swarm-OS), **DISC-14 PS-16** (C2), **DISC-14 PS-32** (Navy EMP).
+[![CI](https://github.com/sargupta/sargvision-console/actions/workflows/ci.yml/badge.svg)](https://github.com/sargupta/sargvision-console/actions/workflows/ci.yml)
+[![Deploy](https://github.com/sargupta/sargvision-console/actions/workflows/deploy.yml/badge.svg)](https://github.com/sargupta/sargvision-console/actions/workflows/deploy.yml)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+[![Next.js](https://img.shields.io/badge/next.js-16-black)](https://nextjs.org)
 
-Next.js 16 · React 19 · Tailwind v4 · MapLibre + deck.gl · WebSocket + msgpack · Zustand · milsymbol (APP-6D NATO).
-
----
+> *Anduril Lattice-grade operator console for the SARGVISION Swarm command system.*
+> Map, wire log, kill chain, BFT votes, replay scrubber, and post-mortem in one screen.
 
 ## What this is
 
-A live mission console for the Python swarm engine at `~/Documents/GitHub/sargvision-swarm`. The FastAPI bridge in that repo (`swarm-bridge`) streams 10 Hz frames of swarm state — drone poses, comm-range adjacency, recent A2A/Zenoh/MAVLink/BFT/gRPC messages, BFT votes, ED-CBBA bids — into this React console, which renders them as a defense-grade tactical view.
+`sargvision-console` is the operator UI for SARGVISION Swarm. It connects via WebSocket to the
+Python bridge (`sargvision-swarm`) and renders the live drone swarm, hostile contacts, comm graph,
+SHIELD/VAJRA/CHANAKYA telemetry, multi-protocol wire log, and Sanskrit-named doctrine panels.
 
-The console looks and behaves like Anduril Lattice / Helsing Altra / Saronic Echelon — not like a generic AI dashboard.
+Built for **Operation Trishul** — the 90-second scripted multi-axis attack scenario against three
+named HVTs (Leh Airbase, Karu Power Station, DBO Forward Post) — and four other scenarios
+(Counter-Swarm, Migration, LAC-ISR, Carrier Defense).
 
-## Quickstart
+## Live demo
+
+- **App:** https://sargvision-swarm.pages.dev
+- **Backend bridge:** https://sargvision-swarm-bridge.fly.dev
+
+## Quick start (local dev)
 
 ```bash
-# 1. backend swarm engine + WebSocket bridge
-cd ~/Documents/GitHub/sargvision-swarm
-uv run swarm-bridge          # http://127.0.0.1:8765, ws /swarm
+# Install (uses bun)
+bun install
 
-# 2. console (this repo)
-cd ~/Documents/GitHub/sargvision-console
-bun run dev                  # http://127.0.0.1:3000
+# Run dev server
+bun run dev
+# Open http://localhost:3000
+
+# In a separate terminal, run the backend:
+#   cd ../sargvision-swarm && python -m uvicorn sargvision_swarm.server.bridge:app
 ```
-
-Open `http://127.0.0.1:3000` and you see 24 ALFA-S Chanakya-class drones over **Leh, Ladakh** (LAC counter-swarm wedge).
-
-## Mission queue (top-bar dropdown)
-
-| ID | Mission | Service | iDEX ref | Ticket |
-|---|---|---|---|---|
-| `coverage` | IAF Counter-Swarm Intercept | IAF | ADITI 2.0 PS-11 | ₹25 cr |
-| `formation_v` | Army LAC Persistent ISR | Army | DISC-14 PS-21 | ₹11.5 cr |
-| `flock` | Navy Carrier Defense Mesh | Navy | DISC-14 PS-32 | ₹1.5 cr |
-| `hover` | Hold Station | — | — | — |
-
-Switching the mission live POSTs `/scenario/{id}` to the bridge — backend resets `LiveSession`, frontend re-renders fresh formation in seconds.
-
-## Symbols & colors
-
-- **NATO APP-6D Friend-UAV** (milsymbol SIDC `1003…`) per drone.
-- Role tint: **cyan** worker · **green** scout · **amber** relay · **saffron** leader.
-- A2A messages → **purple arcs** (fade 1.4 s TTL).
-- Zenoh pose → cyan, MAVLink heartbeat → green, gRPC cognition → orange, BFT vote → red (thick).
-- Saffron `#FF8A1F` panel chrome only — **never** on tactical layer (collides with NATO yellow = Unknown).
-
-## Brooks-subsumption discipline
-
-LLM emits **slow-loop intent**. Reflex layer (Boids / Olfati-Saber / BVC) closes the **fast control loop**. LLM never blocks an actuator. Standard rule for survivable autonomy.
-
-## What's proprietary (the moat)
-
-Algorithms are public commodity. The moat layers:
-
-| Moat | Path | Timeline |
-|---|---|---|
-| **DGQA "Fit for Indian Military Use" cert** | replicate ideaForge SWITCH MINI path | M0–M12 |
-| **PX4-fork autopilot on C-DAC Vega + Astra Microwave** | indigenous silicon, no Chinese parts | M0–M18 |
-| **Indian-terrain sim + data flywheel** | NSIL/GalaxEye SAR + Survey of India + Bhuvan | M6–M18 |
-| **Ex-IAF/IA/IN officers + 3-star MoD sponsor** | hire bench, procurement intel | M0–M6 |
-| **iDEX → ATR Chitradurga → Make-II** | trial slots, serialized procurement | M0–M24 |
 
 ## Architecture
 
+- **Next.js 16** + **React 19** + **Tailwind v4** + **Zustand**
+- **MapLibre GL JS 5** — sovereign-acceptable open-source map (no Mapbox key, swaps to ISRO Bhuvan)
+- **deck.gl 9** — IconLayer (drones, hostiles, HVTs), PathLayer (LoC, trails), ArcLayer (comm + engagement), TextLayer (callsigns, kill flashes)
+- **WebSocket + msgpack** — 10 Hz frame stream from the FastAPI bridge
+
 ```
-src/
-  app/
-    layout.tsx        Inter + JetBrains Mono fonts, dark CSS vars
-    page.tsx          assembles SwarmMap + TopBar + AssetRail + Inspector
-                      + CommsLog + CBBAPanel + BFTAlert
-    globals.css       defense palette + Tailwind v4 @theme tokens
-  components/
-    SwarmMap          MapLibre + deck.gl IconLayer / ArcLayer / LineLayer
-    BasemapSwitcher   SAT (ESRI) / DARK (CARTO) / BHUVAN (ISRO) toggle
-    TopBar            brand + MissionPicker + live telemetry stats
-    MissionPicker     scenario dropdown w/ iDEX ref + ticket
-    AssetRail         left rail, 24-drone list + click-to-select
-    Inspector         right rail, ALFA-S card + intent timeline +
-                      lat/lon/alt + recent comms + ED-CBBA bids
-    AlfaSilhouette    inline SVG of ALFA-S Chanakya delta-wing
-    IntentTimeline    color-coded last-8 intent chips per drone
-    CommsLog          bottom drawer w/ protocol counters + wire log
-    CBBAPanel         live ED-CBBA bid stream during coverage
-    BFTAlert          top-center modal when SwarmRaft vote fires
-  lib/
-    types.ts          SwarmFrame / DroneState / WireMessageEvent / …
-    store.ts          Zustand: connected + frame + selectedDroneId
-    history.ts        Zustand: intent ring buffer per drone
-    ws.ts             WebSocket client w/ msgpackr + auto-reconnect
-    symbols.ts        milsymbol → PNG canvas → deck.gl IconLayer URL
-    basemaps.ts       MapLibre style specs (ESRI / CARTO / Bhuvan)
-    missions.ts       mission catalogue + POST /scenario/{id}
+┌──────────────────────────────────────────────────────────────────┐
+│ TopBar          [Mission picker · Threat counters · JAM/GNSS]    │
+├─────────┬─────────────────────────────────────┬──────────────────┤
+│ Asset   │              SwarmMap               │  RightDock       │
+│ Rail    │  (3D terrain + drones + HVTs +      │  ├ MissionObj    │
+│ (24×)   │   LoC + comm arcs + kill flashes)   │  ├ RightTabPanel │
+│         │                                     │  └ BFTAlert      │
+│         ├─────────────────────────────────────┤                  │
+│         │           CommsLog (h-32)           │                  │
+└─────────┴─────────────────────────────────────┴──────────────────┘
+  Overlays: DegradedOpsBanner · TrishulPhaseBanner · ReplayScrubber
+            MissionBriefing · PostMortem · DoctrinePanel
 ```
 
-## Stack rationale
+## Scenarios
 
-- **MapLibre + deck.gl interleaved overlay** — 100 markers + arcs + lines without React re-render storms.
-- **msgpack over WebSocket** — ~1–3 KB per frame at 10 Hz, half the bytes of JSON.
-- **Zustand** with stable empty array refs — avoids React 19's `getServerSnapshot` infinite loop on selectors with defaults.
-- **milsymbol → canvas PNG → deck.gl** — deck.gl can't decode SVG blob URLs; canvas PNG is the robust path.
-- **Tailwind v4 `@theme` directive** — CSS-var-first design tokens, no JS config, smaller bundle.
+| Mission              | Backend ID        | Service |
+|----------------------|-------------------|---------|
+| **Op Trishul**       | `border_strike`   | IAF     |
+| CTR-SWARM            | `coverage`        | IAF     |
+| MIGRATE-LAC          | `migration`       | Army    |
+| LAC-ISR              | `formation_v`     | Army    |
+| CARRIER-DEF          | `flock`           | Navy    |
 
-## Visual language
+## Development
 
-Synthesised from defense-AI UI research (Anduril Lattice, Helsing Altra, Saronic Echelon, Palantir Gotham, Shield AI Hivemind):
+```bash
+bun run lint            # ESLint
+bunx tsc --noEmit       # TypeScript check
+bun run build           # Production build (static export)
+```
 
-- **Canvas `#07090C`**, surface `#0E1218`, elevated `#161B23`.
-- Off-white text `#E6EBF2` — never pure white.
-- 4-tier alert palette: nominal green / caution amber / warning orange / critical red.
-- Brand accent: electric cyan `#00C2FF`.
-- Bengal saffron `#FF8A1F` — panel chrome only.
-- Inter + JetBrains Mono with `tabular-nums` always.
-- 2-4 px border radius max — no `rounded-2xl`.
-- Motion 120-200 ms ease-out only. No springs, no parallax, no glitch.
-- Map is the page. Intent-not-control philosophy.
+## Deployment
 
-## See also
+Production deploys to **Cloudflare Pages** via `.github/workflows/deploy.yml` on push to `main`.
+Static export build (`output: "export"`) — no edge runtime required, fully air-gappable.
 
-- Master plan: `~/Documents/AI_Workspace/drone_swarm_research/00_PIVOT_PLAN.md`
-- iDEX problem statements: `~/Documents/AI_Workspace/drone_swarm_research/16_idex_problems.md`
-- Indian operational scenarios: `~/Documents/AI_Workspace/drone_swarm_research/17_indian_ops.md`
-- Defense AI moats: `~/Documents/AI_Workspace/drone_swarm_research/20_defense_moats.md`
-- SOTA research papers: `~/Documents/AI_Workspace/drone_swarm_research/19_papers_sota.md`
-- Backend swarm engine: `~/Documents/GitHub/sargvision-swarm`
+## Companion repos
+
+- [`sargvision-swarm`](https://github.com/sargupta/sargvision-swarm) — Python backend
+- [`SARGVISION_Docs`](https://github.com/sargupta/SARGVISION_Docs) — Technical briefs, DPR (private)
+
+## License
+
+Apache License 2.0 — see [LICENSE](LICENSE).
+Copyright 2026 SARGVISION Intelligence Private Limited.

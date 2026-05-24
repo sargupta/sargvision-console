@@ -36,13 +36,13 @@ export function BFTAlert() {
   const byz = active.byzantine ?? [];
 
   return (
-    <div className="pointer-events-auto absolute left-1/2 top-16 z-40 w-[420px] -translate-x-1/2">
+    <div className="w-full">
       <div
         className={cn(
-          "overflow-hidden rounded-[2px] border bg-[var(--color-canvas)]/95 backdrop-blur-sm",
+          "overflow-hidden border-l-2",
           passed
-            ? "border-[var(--color-status-ok)]/50"
-            : "border-[var(--color-status-crit)]/60",
+            ? "border-l-[var(--color-status-ok)]"
+            : "border-l-[var(--color-status-crit)]",
         )}
       >
         <header

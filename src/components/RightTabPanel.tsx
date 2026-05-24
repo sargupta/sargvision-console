@@ -10,10 +10,13 @@
 import {
   AlertTriangle,
   Battery,
+  Brain,
+  Compass,
   Crosshair,
   Mountain,
   Network,
   Plane,
+  Radio,
   Repeat,
   ShieldCheck,
   Skull,
@@ -22,12 +25,16 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
+import { ChanakyaPanel } from "@/components/ChanakyaPanel";
+import { EngagementTimeline } from "@/components/EngagementTimeline";
+import { MayaPanel } from "@/components/MayaPanel";
+import { SheshnagPanel } from "@/components/SheshnagPanel";
 import { cn } from "@/lib/cn";
 import { useSwarmStore } from "@/lib/store";
 
 const HTTP_URL = process.env.NEXT_PUBLIC_SWARM_HTTP_URL ?? "http://127.0.0.1:8765";
 
-type TabId = "inspector" | "shield" | "vajra" | "migration";
+type TabId = "inspector" | "shield" | "vajra" | "maya" | "sheshnag" | "chanakya" | "kills" | "migration";
 
 export function RightTabPanel() {
   const selected = useSwarmStore((s) => s.selectedDroneId);
@@ -46,17 +53,24 @@ export function RightTabPanel() {
 
   const shield = frame?.shield;
   const vajra = frame?.vajra;
+  const maya = frame?.maya;
+  const sheshnag = frame?.sheshnag;
+  const chanakya = frame?.chanakya;
   const mig = frame?.migration;
 
-  const tabs: { id: TabId; label: string; Icon: typeof ShieldCheck; show: boolean }[] = [
+  const tabs = ([
     { id: "inspector", label: "Asset", Icon: Crosshair, show: selected != null },
     { id: "shield", label: "SHIELD", Icon: ShieldCheck, show: !!shield },
     { id: "vajra", label: "Vajra", Icon: Zap, show: !!vajra },
+    { id: "maya", label: "Maya", Icon: Brain, show: !!maya },
+    { id: "sheshnag", label: "Sheshnag", Icon: Radio, show: !!sheshnag },
+    { id: "chanakya", label: "Chanakya", Icon: Compass, show: !!chanakya },
+    { id: "kills", label: "Kills", Icon: Skull, show: true },
     { id: "migration", label: "Migration", Icon: Mountain, show: !!mig },
-  ].filter((t) => t.show);
+  ] satisfies { id: TabId; label: string; Icon: typeof ShieldCheck; show: boolean }[]).filter((t) => t.show);
 
   return (
-    <aside className="pointer-events-auto absolute right-0 top-12 z-10 flex h-[calc(100vh-22rem)] w-[28rem] flex-col border-l border-[var(--color-line)] bg-[var(--color-canvas)]/95 backdrop-blur-sm">
+    <aside className="flex h-full w-full flex-col">
       <div className="flex shrink-0 border-b border-[var(--color-line)] bg-[var(--color-elevated)]/40">
         {tabs.map((t) => {
           const active = t.id === tab;
@@ -83,6 +97,10 @@ export function RightTabPanel() {
         {tab === "inspector" && <InspectorBody onClose={() => select(null)} />}
         {tab === "shield" && <ShieldBody />}
         {tab === "vajra" && <VajraBody />}
+        {tab === "maya" && <MayaPanel />}
+        {tab === "sheshnag" && <SheshnagPanel />}
+        {tab === "chanakya" && <ChanakyaPanel />}
+        {tab === "kills" && <EngagementTimeline />}
         {tab === "migration" && <MigrationBody />}
       </div>
     </aside>
@@ -91,19 +109,26 @@ export function RightTabPanel() {
 
 // ── Inspector body ────────────────────────────────────────────────────
 
+import type { WireMessageEvent } from "@/lib/types";
+const EMPTY_RECENT: ReadonlyArray<WireMessageEvent> = [];
+
 function InspectorBody({ onClose }: { onClose: () => void }) {
-  const drone = useSwarmStore((s) =>
-    s.selectedDroneId == null
-      ? null
-      : s.frame?.drones.find((d) => d.id === s.selectedDroneId) ?? null,
+  const selectedId = useSwarmStore((s) => s.selectedDroneId);
+  const frame = useSwarmStore((s) => s.frame);
+  const drone = useMemo(
+    () =>
+      selectedId == null
+        ? null
+        : frame?.drones.find((d) => d.id === selectedId) ?? null,
+    [selectedId, frame],
   );
-  const recent = useSwarmStore((s) => {
-    if (s.selectedDroneId == null || !s.frame) return [];
-    return s.frame.recent_messages
-      .filter((m) => m.src === s.selectedDroneId || m.dst === s.selectedDroneId)
+  const recent = useMemo(() => {
+    if (selectedId == null || !frame) return EMPTY_RECENT;
+    return frame.recent_messages
+      .filter((m) => m.src === selectedId || m.dst === selectedId)
       .slice(-8)
       .reverse();
-  });
+  }, [selectedId, frame]);
 
   if (!drone) return <div className="text-[10.5px] text-[var(--color-text-vdim)]">No drone selected</div>;
 

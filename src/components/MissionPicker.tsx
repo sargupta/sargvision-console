@@ -57,7 +57,7 @@ export function MissionPicker() {
       </button>
 
       {open && (
-        <div className="pointer-events-auto absolute left-0 top-[calc(100%+6px)] z-30 w-[480px] rounded-[2px] border border-[var(--color-line)] bg-[var(--color-canvas)]/97 p-2 shadow-2xl backdrop-blur-sm">
+        <div className="pointer-events-auto absolute left-0 top-[calc(100%+6px)] z-50 w-[480px] rounded-[2px] border border-[var(--color-line)] bg-[var(--color-canvas)]/97 p-2 shadow-2xl backdrop-blur-sm">
           <div className="mb-1 px-1 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--color-text-vdim)]">
             Mission queue
           </div>

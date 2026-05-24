@@ -8,6 +8,10 @@ import type { SwarmFrame } from "./types";
 interface SwarmStore {
   connected: boolean;
   _liveFrame: SwarmFrame | null;
+  // `frame` is injected by the hook wrapper below — it resolves to the replay-
+  // scrubbed frame when scrubbing, else the live frame. Declared here so TS
+  // selectors don't fail.
+  frame: SwarmFrame | null;
   selectedDroneId: number | null;
   setConnected: (c: boolean) => void;
   setFrame: (f: SwarmFrame) => void;
@@ -18,6 +22,9 @@ interface SwarmStore {
 const _store = create<SwarmStore>((set) => ({
   connected: false,
   _liveFrame: null,
+  // `frame` is computed on the fly by the wrapper below — never stored directly,
+  // never mutated. Declaring it `null` here just satisfies the type.
+  frame: null,
   selectedDroneId: null,
   setConnected: (connected) => set({ connected }),
   setFrame: (frame) => set({ _liveFrame: frame }),
@@ -31,9 +38,9 @@ export const useSwarmStore: typeof _store = ((selector?: any, equality?: any) =>
   const wrapped = (state: SwarmStore) => {
     const replayState = useReplay.getState();
     const effectiveFrame = replayState.scrubbed ?? state._liveFrame;
-    return selector({ ...state, frame: effectiveFrame } as SwarmStore & { frame: SwarmFrame | null });
+    return selector({ ...state, frame: effectiveFrame });
   };
-  return _store(wrapped, equality);
+  return (_store as any)(wrapped, equality);
 }) as typeof _store;
 
 Object.assign(useSwarmStore, {

@@ -2,7 +2,7 @@
 
 import "maplibre-gl/dist/maplibre-gl.css";
 
-import { ArcLayer, ColumnLayer, IconLayer, LineLayer, TextLayer } from "@deck.gl/layers";
+import { ArcLayer, IconLayer, LineLayer, TextLayer } from "@deck.gl/layers";
 import { MapboxOverlay } from "@deck.gl/mapbox";
 import maplibregl from "maplibre-gl";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -14,8 +14,11 @@ import {
   preloadDroneIcons,
 } from "@/lib/drone-glyphs";
 import { useSwarmStore } from "@/lib/store";
+import type { DroneState } from "@/lib/types";
 import { BasemapSwitcher } from "./BasemapSwitcher";
+import { mcscLayers } from "./MCSCLayers";
 import { migrationLayers } from "./MigrationLayers";
+import { trishulLayers } from "./TrishulLayers";
 
 const DEFAULT_CENTER: [number, number] = [77.5770, 34.1526];
 const DEFAULT_ZOOM = 13.2;
@@ -45,9 +48,9 @@ export function SwarmMap() {
       style: BASEMAPS.satellite.style,
       center: DEFAULT_CENTER,
       zoom: DEFAULT_ZOOM,
-      pitch: 58,
-      bearing: -16,
-      maxPitch: 75,
+      pitch: 0,
+      bearing: 0,
+      maxPitch: 60,
       attributionControl: { compact: true },
     });
     map.addControl(
@@ -66,10 +69,26 @@ export function SwarmMap() {
     };
   }, []);
 
+  // Skip the very first invocation — the map was already created with the
+  // satellite style, and calling setStyle({diff:false}) would wipe the freshly-
+  // added MapboxOverlay's interleaved layers, leaving deck.gl drawing nothing.
+  const basemapMountedRef = useRef(false);
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
+    if (!basemapMountedRef.current) {
+      basemapMountedRef.current = true;
+      return;
+    }
     map.setStyle(BASEMAPS[basemap].style as never, { diff: false });
+    // After a style swap, re-attach the deck overlay so its interleaved
+    // layers get rebuilt on the new style.
+    map.once("style.load", () => {
+      if (overlayRef.current) {
+        map.removeControl(overlayRef.current);
+        map.addControl(overlayRef.current);
+      }
+    });
   }, [basemap]);
 
   const frame = useSwarmStore((s) => s.frame);
@@ -77,7 +96,7 @@ export function SwarmMap() {
   const select = useSwarmStore((s) => s.select);
 
   const droneIndex = useMemo(() => {
-    if (!frame) return new Map<number, (typeof frame.drones)[number]>();
+    if (!frame) return new Map<number, DroneState>();
     return new Map(frame.drones.map((d) => [d.id, d]));
   }, [frame]);
 
@@ -101,6 +120,9 @@ export function SwarmMap() {
       id: "drones",
       data: iconData,
       pickable: true,
+      // 3D terrain lifts Leh ground to ~3500m AMSL but drones are at z=6m in
+      // sim coords — without this they get z-buried inside the mountain mesh.
+      parameters: { depthTest: false },
       onClick: ({ object }) => {
         if (object?.drone) select(object.drone.id);
       },
@@ -133,48 +155,6 @@ export function SwarmMap() {
       },
     });
 
-    // ── 3D drone columns — vertical hover-stalks colored by role/shield ──
-    const ROLE_COLOR_RGB: Record<string, [number, number, number]> = {
-      worker: [0, 194, 255],
-      scout: [74, 230, 160],
-      relay: [255, 200, 61],
-      leader: [255, 138, 31],
-    };
-    const SHIELD_OVERRIDE: Record<string, [number, number, number] | undefined> = {
-      hijacked: [255, 77, 94],
-      kill_switched: [120, 120, 120],
-      suspect: [255, 200, 61],
-    };
-    const columnData = frame.drones.map((d) => {
-      const sc = d.shield_class ?? "loyal";
-      const color =
-        SHIELD_OVERRIDE[sc] ?? ROLE_COLOR_RGB[d.role] ?? [0, 194, 255];
-      return {
-        position: [d.lon, d.lat] as [number, number],
-        color,
-        height: Math.max(40, d.alt_m * 60),  // sim alt 6m × 60 → 360m column visible at zoom 13
-        drone: d,
-      };
-    });
-    const columnLayer = new ColumnLayer({
-      id: "drone-columns",
-      data: columnData,
-      diskResolution: 16,
-      radius: 8,
-      radiusUnits: "pixels",
-      extruded: true,
-      pickable: false,
-      elevationScale: 1,
-      getPosition: (d) => d.position,
-      getElevation: (d) => d.height,
-      getFillColor: (d) => [...d.color, 180] as [number, number, number, number],
-      getLineColor: [10, 14, 20, 230],
-      updateTriggers: {
-        getElevation: [frame.step],
-        getFillColor: [frame.drones.map((d) => d.shield_class ?? "loyal").join(",")],
-      },
-    });
-
     // Heading arrow per drone — short directional tick.
     const headingArrowData = frame.drones.map((d) => {
       const headingRad = (Math.PI / 180) * d.heading_deg;
@@ -189,6 +169,7 @@ export function SwarmMap() {
     const headingArrowLayer = new LineLayer({
       id: "drone-heading",
       data: headingArrowData,
+      parameters: { depthTest: false },
       getSourcePosition: (d) => d.source,
       getTargetPosition: (d) => d.target,
       getColor: [230, 240, 250, 170],
@@ -224,6 +205,7 @@ export function SwarmMap() {
       id: "hostiles",
       data: hostileData,
       pickable: false,
+      parameters: { depthTest: false },
       getIcon: (d: (typeof hostileData)[number]) => ({
         url: d.icon.url,
         width: d.icon.width,
@@ -274,6 +256,7 @@ export function SwarmMap() {
     const threatLayer = new LineLayer({
       id: "threat-vectors",
       data: hostileData,
+      parameters: { depthTest: false },
       getSourcePosition: (d: (typeof hostileData)[number]) => d.position,
       getTargetPosition: () => centroid,
       getColor: [255, 77, 94, 70],
@@ -304,6 +287,7 @@ export function SwarmMap() {
     const engagementArcLayer = new ArcLayer({
       id: "engagement-arcs",
       data: engageData,
+      parameters: { depthTest: false },
       getSourcePosition: (d) => d.source,
       getTargetPosition: (d) => d.target,
       getSourceColor: [255, 200, 60, 220],
@@ -333,6 +317,7 @@ export function SwarmMap() {
     const killLayer = new IconLayer({
       id: "kill-flash",
       data: killData,
+      parameters: { depthTest: false },
       getIcon: () => ({
         url: killFlashIcon.url,
         width: killFlashIcon.width,
@@ -419,9 +404,36 @@ export function SwarmMap() {
         })
       : null;
 
-    // ── 3. Comm-range edges (subtle background) ───────────────────
+    // ── 3. Comm-range edges (top-K per drone, not full mesh) ───────
+    // Full N×N comm-range edges drown the map in cyan noise. Real swarms
+    // only keep a few high-strength neighbours per drone (k-NN mesh,
+    // typical k=3–4 for distributed-coordination protocols). We filter
+    // to the strongest K=3 neighbours per drone and de-duplicate.
+    const K_NEIGHBOURS = 3;
+    const perNodeEdges = new Map<number, Array<{ other: number; strength: number }>>();
+    for (const e of frame.edges) {
+      if (!droneIndex.has(e.src) || !droneIndex.has(e.dst)) continue;
+      const a = perNodeEdges.get(e.src) ?? [];
+      const b = perNodeEdges.get(e.dst) ?? [];
+      a.push({ other: e.dst, strength: e.strength });
+      b.push({ other: e.src, strength: e.strength });
+      perNodeEdges.set(e.src, a);
+      perNodeEdges.set(e.dst, b);
+    }
+    const kept = new Set<string>();
+    for (const [node, neighbours] of perNodeEdges) {
+      neighbours.sort((p, q) => q.strength - p.strength);
+      for (const n of neighbours.slice(0, K_NEIGHBOURS)) {
+        const lo = Math.min(node, n.other);
+        const hi = Math.max(node, n.other);
+        kept.add(`${lo}-${hi}`);
+      }
+    }
     const edgeData = frame.edges
       .map((e) => {
+        const lo = Math.min(e.src, e.dst);
+        const hi = Math.max(e.src, e.dst);
+        if (!kept.has(`${lo}-${hi}`)) return null;
         const a = droneIndex.get(e.src);
         const b = droneIndex.get(e.dst);
         if (!a || !b) return null;
@@ -439,9 +451,13 @@ export function SwarmMap() {
     const edgeLayer = new LineLayer({
       id: "comm-edges",
       data: edgeData,
+      parameters: { depthTest: false },
       getSourcePosition: (d) => d.sourcePosition,
       getTargetPosition: (d) => d.targetPosition,
-      getColor: (d) => [0, 194, 255, Math.round(20 + 40 * d.strength)],
+      // Lower base opacity so the mesh sits as a faint lattice, not the
+      // dominant visual layer. Strength still modulates so high-bandwidth
+      // links stand out.
+      getColor: (d) => [0, 194, 255, Math.round(12 + 28 * d.strength)],
       getWidth: 1,
       widthUnits: "pixels",
     });
@@ -475,6 +491,7 @@ export function SwarmMap() {
     const arcLayer = new ArcLayer({
       id: "comm-arcs",
       data: arcData,
+      parameters: { depthTest: false },
       getSourcePosition: (d) => d.source,
       getTargetPosition: (d) => d.target,
       getSourceColor: (d) => d.color,
@@ -488,13 +505,27 @@ export function SwarmMap() {
     // Governed Migration zone + hazard layers (under everything tactical).
     const migLayers = migrationLayers(frame.migration);
 
+    // MAYA / CHANAKYA / SHESHNAG layers (defense rings, panic glow, geodesics, beacons).
+    // Order matters — caller above ensures defense rings + panic glow render BEFORE
+    // the hostile/friendly icons so they sit underneath.
+    const xLayers = mcscLayers(
+      frame.drones,
+      frame.hostiles,
+      frame.chanakya,
+      frame.sheshnag,
+    );
+
+    // Operation Trishul border-strike layers (LoC line, HVT shields, axis arrows).
+    const tLayers = trishulLayers(frame.trishul);
+
     const layers = [
       ...migLayers,
+      ...xLayers,             // defense rings + panic glow + geodesics + beacons
+      ...tLayers,             // LoC + HVT shields + threat axis arrows
       edgeLayer,
       threatLayer,
       arcLayer,
       engagementArcLayer,
-      columnLayer,           // 3D vertical stalks beneath the icons
       hostileLayer,
       hostileLabelLayer,
       headingArrowLayer,
@@ -503,7 +534,12 @@ export function SwarmMap() {
       killLayer,
       killLabelLayer,
     ];
-    if (haloLayer) layers.splice(8 + migLayers.length, 0, haloLayer);
+    if (haloLayer)
+      layers.splice(
+        7 + migLayers.length + xLayers.length + tLayers.length,
+        0,
+        haloLayer,
+      );
     overlayRef.current.setProps({ layers });
   }, [frame, selectedId, select, droneIndex]);
 

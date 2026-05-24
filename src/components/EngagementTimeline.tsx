@@ -39,7 +39,7 @@ export function EngagementTimeline() {
   const tail = events.slice(-100).reverse();
 
   return (
-    <section className="pointer-events-auto absolute left-72 bottom-[20rem] z-10 flex h-44 w-[26rem] flex-col rounded-[2px] border border-[var(--color-line)] bg-[var(--color-canvas)]/92 backdrop-blur-sm">
+    <section className="flex h-full w-full flex-col">
       <header className="flex items-baseline justify-between border-b border-[var(--color-line)] px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em]">
         <span className="inline-flex items-center gap-1.5 text-[var(--color-text-dim)]">
           <Crosshair className="h-3 w-3" />

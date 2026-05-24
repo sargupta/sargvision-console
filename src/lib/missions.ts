@@ -16,6 +16,16 @@ export interface Mission {
 
 export const MISSIONS: Mission[] = [
   {
+    id: "border_strike",
+    short: "TRISHUL",
+    title: "Op Trishul · Border Strike Defence",
+    service: "IAF",
+    idex_ref: "ADITI 2.0 PS-11",
+    ticket_inr_cr: 25,
+    brief:
+      "Cross-LoC drone swarm targets LEH AIRBASE + Karu power station + DBO forward post. Scripted 90-second kill chain: Drishti detection → Prajna classification → Yajna auction → Sabha ROE → Vajra intercept. HVTs PROTECTED.",
+  },
+  {
     id: "coverage",
     short: "CTR-SWARM",
     title: "IAF Counter-Swarm Intercept",
