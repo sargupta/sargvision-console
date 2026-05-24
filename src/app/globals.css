@@ -63,3 +63,40 @@ body {
 
 .scrollbar-hidden::-webkit-scrollbar { display: none; }
 .scrollbar-hidden { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ── Mobile readability overrides ──────────────────────────────────────
+   Phone screens with lower brightness + ambient light wash out the very-dim
+   slate tokens. Lift each dim level one step + thicken borders + bump the
+   smallest text up so labels stay legible. Only applies below the Tailwind
+   `md` breakpoint (<768px) so desktop institutional density is preserved.
+   `!important` is required because Tailwind v4's @theme emits the tokens at
+   :root, :host with theme-layer specificity that otherwise wins the cascade. */
+@media (max-width: 767px) {
+  :root, html, body {
+    --color-text-dim:  #BCC8DA !important;   /* slate-300 (was slate-400) */
+    --color-text-vdim: #8FA0BC !important;   /* slate-450 (was slate-600) */
+    --color-line:      #36445E !important;   /* slate-700+ (was slate-800) */
+    --color-elevated:  #1B2230 !important;   /* slightly lighter elevated surface */
+    --color-canvas:    #0A0E14 !important;   /* slight lift so backdrops aren't pure black */
+    --color-surface:   #131922 !important;   /* lift surface for sheet/dock readability */
+  }
+
+  /* Small UI text is hard to read on phones; nudge anything ≤ 10.5px up a step. */
+  .text-\[10px\],
+  .text-\[10\.5px\] { font-size: 12px !important; line-height: 1.35 !important; }
+  .text-\[11px\]    { font-size: 12.5px !important; }
+  .text-\[8\.5px\], .text-\[9px\], .text-\[9\.5px\] { font-size: 11px !important; }
+
+  /* Hairline borders disappear on retina mobile — bump to 1.5px where they matter. */
+  .border-\[var\(--color-line\)\] { border-color: var(--color-line) !important; }
+
+  /* Map attribution + map controls — make sure they're not invisible against light tiles */
+  .maplibregl-ctrl-attrib { background: rgba(7, 9, 12, 0.85) !important; }
+}
+
+/* Respect user dark-mode preference explicitly so iOS Safari doesn't auto-invert. */
+@media (prefers-color-scheme: light) {
+  :root { color-scheme: dark; }
+}
+
+html { color-scheme: dark; }
