@@ -40,26 +40,26 @@ export function MissionObjectives() {
       <Objective
         done
         label="Perimeter established"
-        detail="24 ALFA-S in vyuha — leader + 4 scout + 4 relay + 15 worker"
+        detail="24 Sentinel UAVs in formation — leader + 4 scout + 4 relay + 15 worker"
       />
       <Objective
         done={detected >= 1}
         label={`Detect inbound (${detected}/${total})`}
-        detail={detected > 0 ? "drishti — sensor coherence across squadron" : "scanning…"}
+        detail={detected > 0 ? "detection — sensor coherence across squadron" : "scanning…"}
       />
       <Objective
         done={classified >= 1}
         label={`Classify threats (${classified}/${total})`}
         detail={
           shield
-            ? `prajna · DECOY ${shield.threat_mix.decoy ?? 0} · KINETIC ${shield.threat_mix.kinetic ?? 0} · NUISANCE ${shield.threat_mix.nuisance ?? 0}`
+            ? `classification · DECOY ${shield.threat_mix.decoy ?? 0} · KINETIC ${shield.threat_mix.kinetic ?? 0} · NUISANCE ${shield.threat_mix.nuisance ?? 0}`
             : "Bayesian update pending…"
         }
       />
       <Objective
         done={decoyed >= 1}
         label={`Skip decoys (${decoyed} saved)`}
-        detail="yukti — trust × E[damage] gates ED-CBBA bids"
+        detail="trust-gate — trust × E[damage] gates ED-CBBA bids"
       />
       <Objective
         done={kia >= 1}

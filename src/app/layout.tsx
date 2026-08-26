@@ -23,9 +23,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SARGVISION Swarm — Mission Console",
+  title: "SARGVISION CFM — Counter-UAS Console",
   description:
-    "Indian-stack EW-survivable counter-swarm command console. ADITI 2.0 / DISC-14.",
+    "EW-survivable counter-UAS coordination console — critical-infrastructure defence demo.",
 };
 
 export default function RootLayout({

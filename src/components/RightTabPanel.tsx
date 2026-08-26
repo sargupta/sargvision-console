@@ -63,8 +63,8 @@ export function RightTabPanel() {
     { id: "shield", label: "SHIELD", Icon: ShieldCheck, show: !!shield },
     { id: "vajra", label: "Vajra", Icon: Zap, show: !!vajra },
     { id: "maya", label: "Maya", Icon: Brain, show: !!maya },
-    { id: "sheshnag", label: "Sheshnag", Icon: Radio, show: !!sheshnag },
-    { id: "chanakya", label: "Chanakya", Icon: Compass, show: !!chanakya },
+    { id: "sheshnag", label: "Mesh", Icon: Radio, show: !!sheshnag },
+    { id: "chanakya", label: "Route", Icon: Compass, show: !!chanakya },
     { id: "kills", label: "Kills", Icon: Skull, show: true },
     { id: "migration", label: "Migration", Icon: Mountain, show: !!mig },
   ] satisfies { id: TabId; label: string; Icon: typeof ShieldCheck; show: boolean }[]).filter((t) => t.show);
@@ -286,7 +286,7 @@ function VajraBody() {
   return (
     <div className="font-mono text-[11px]">
       <header className="mb-2 flex items-center justify-between text-[10px] uppercase tracking-[0.18em]">
-        <span className="text-[var(--color-saffron)]">STRIKE DOCTRINE</span>
+        <span className="text-[var(--color-saffron)]">ALLOCATION DOCTRINE</span>
         <span className={cn(
           "rounded-[1px] border px-1.5 py-0.5",
           fragmented

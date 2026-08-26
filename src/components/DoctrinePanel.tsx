@@ -4,6 +4,7 @@ import { BookOpen, X } from "lucide-react";
 import { useState } from "react";
 
 import { DOCTRINES, type Doctrine } from "@/lib/doctrine";
+import { useSwarmStore } from "@/lib/store";
 
 const LAYER_COLOR: Record<Doctrine["layer"], string> = {
   command: "var(--color-saffron)",
@@ -29,6 +30,12 @@ const LAYER_LABEL: Record<Doctrine["layer"], string> = {
 
 export function DoctrinePanel() {
   const [open, setOpen] = useState(false);
+  const demo = useSwarmStore((s) => s.demo);
+
+  // The doctrine catalogue is internal IP (Sanskrit doctrine ↔ algorithm
+  // mapping). Suppress it on the public demo build to keep the civilian
+  // deployment free of operational-doctrine detail.
+  if (demo) return null;
 
   if (!open) {
     return (
@@ -36,7 +43,7 @@ export function DoctrinePanel() {
         type="button"
         onClick={() => setOpen(true)}
         className="pointer-events-auto absolute right-3 top-32 z-20 inline-flex items-center gap-1.5 rounded-[2px] border border-[var(--color-saffron)]/40 bg-[var(--color-canvas)]/90 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--color-saffron)] backdrop-blur-sm hover:bg-[var(--color-saffron)]/15"
-        title="Open Chanakya Doctrine — every algorithm running with its math + Indian doctrinal name + arXiv source"
+        title="Open Algorithm Doctrine — every algorithm running with its math + arXiv source"
       >
         <BookOpen className="h-3 w-3" />
         Doctrine
@@ -63,10 +70,10 @@ export function DoctrinePanel() {
         <header className="flex items-center justify-between border-b border-[var(--color-saffron)]/30 px-6 py-3">
           <div>
             <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-[var(--color-saffron)]">
-              चाणक्य नीति · Chanakya Doctrine
+              Algorithm Doctrine
             </div>
             <div className="mt-0.5 font-mono text-[13px] tracking-[0.06em] text-[var(--color-text)]">
-              Every algorithm running inside SARGVISION — math, Sanskrit, citation
+              Every algorithm running inside SARGVISION CFM — math + citation
             </div>
             <div className="mt-1 max-w-[60ch] font-mono text-[10.5px] text-[var(--color-text-dim)]">
               Algorithms in isolation are public commodity. Composition + Indian-terrain
