@@ -43,7 +43,7 @@ export function TrishulPhaseBanner() {
               className="text-[10.5px] uppercase tracking-[0.22em]"
               style={{ color }}
             >
-              // OPERATION TRISHUL
+              // COUNTER-UAS DEFENCE
             </span>
             <span className="text-[9.5px] uppercase tracking-[0.22em] text-[var(--color-text-vdim)]">
               PHASE {ph.idx + 1}/{ph.of} · {elapsedTxt}

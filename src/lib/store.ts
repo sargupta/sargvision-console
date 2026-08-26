@@ -7,6 +7,8 @@ import type { SwarmFrame } from "./types";
 
 interface SwarmStore {
   connected: boolean;
+  /** True when playing a bundled recorded session (no live backend). */
+  demo: boolean;
   _liveFrame: SwarmFrame | null;
   // `frame` is injected by the hook wrapper below — it resolves to the replay-
   // scrubbed frame when scrubbing, else the live frame. Declared here so TS
@@ -14,6 +16,7 @@ interface SwarmStore {
   frame: SwarmFrame | null;
   selectedDroneId: number | null;
   setConnected: (c: boolean) => void;
+  setDemo: (d: boolean) => void;
   setFrame: (f: SwarmFrame) => void;
   select: (id: number | null) => void;
   reset: () => void;
@@ -21,12 +24,14 @@ interface SwarmStore {
 
 const _store = create<SwarmStore>((set) => ({
   connected: false,
+  demo: false,
   _liveFrame: null,
   // `frame` is computed on the fly by the wrapper below — never stored directly,
   // never mutated. Declaring it `null` here just satisfies the type.
   frame: null,
   selectedDroneId: null,
   setConnected: (connected) => set({ connected }),
+  setDemo: (demo) => set({ demo }),
   setFrame: (frame) => set({ _liveFrame: frame }),
   select: (selectedDroneId) => set({ selectedDroneId }),
   reset: () => set({ _liveFrame: null, selectedDroneId: null }),

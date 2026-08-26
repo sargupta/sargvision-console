@@ -16,6 +16,7 @@ const SERVICE_ICON = {
 export function MissionPicker() {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState<string | null>(null);
   const active = useSwarmStore((s) => s.frame?.scenario);
 
   const current: Mission =
@@ -25,8 +26,11 @@ export function MissionPicker() {
   async function pick(m: Mission) {
     setBusy(true);
     setOpen(false);
+    setFailed(null);
     try {
-      await switchMission(m.id);
+      // Never throws — it reports which path served the switch.
+      const how = await switchMission(m.id);
+      if (how === "unavailable") setFailed(m.short);
     } finally {
       setBusy(false);
     }
@@ -55,6 +59,12 @@ export function MissionPicker() {
           )}
         />
       </button>
+
+      {failed && (
+        <div className="pointer-events-none absolute left-0 top-[calc(100%+4px)] z-40 whitespace-nowrap rounded-[2px] border border-[var(--color-status-warn)]/50 bg-[var(--color-canvas)]/95 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-[var(--color-status-warn)]">
+          {failed} unavailable — no backend, no recording
+        </div>
+      )}
 
       {open && (
         <div className="pointer-events-auto absolute left-0 top-[calc(100%+6px)] z-50 w-[480px] rounded-[2px] border border-[var(--color-line)] bg-[var(--color-canvas)]/97 p-2 shadow-2xl backdrop-blur-sm">

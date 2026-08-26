@@ -12,6 +12,7 @@ const HTTP_URL = process.env.NEXT_PUBLIC_SWARM_HTTP_URL ?? "http://127.0.0.1:876
 
 export function TopBar() {
   const connected = useSwarmStore((s) => s.connected);
+  const demo = useSwarmStore((s) => s.demo);
   const frame = useSwarmStore((s) => s.frame);
   const n = frame?.drones.length ?? 0;
   const t = frame?.t ?? 0;
@@ -105,6 +106,13 @@ export function TopBar() {
           <span className="hidden sm:inline">{gnss ? "GNSS-DENIED" : "GNSS-OK"}</span>
         </button>
 
+        {demo && (
+          <span className="inline-flex items-center gap-1.5 rounded-[2px] border border-[var(--color-status-warn)]/50 bg-[var(--color-status-warn)]/10 px-2 py-0.5 uppercase tracking-[0.18em] text-[var(--color-status-warn)]">
+            <Radio className="h-3 w-3" />
+            <span className="hidden sm:inline">DEMO · REPLAY</span>
+          </span>
+        )}
+
         <span
           className={cn(
             "inline-flex items-center gap-1.5 rounded-[2px] border px-2 py-0.5 uppercase tracking-[0.18em]",
@@ -114,7 +122,7 @@ export function TopBar() {
           )}
         >
           {connected ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}
-          <span className="hidden sm:inline">{connected ? "LINK UP" : "LINK DOWN"}</span>
+          <span className="hidden sm:inline">{connected ? (demo ? "REPLAY" : "LINK UP") : "LINK DOWN"}</span>
         </span>
       </div>
     </div>

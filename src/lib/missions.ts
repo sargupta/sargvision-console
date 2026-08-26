@@ -4,6 +4,8 @@
  * console-side naming + ROE + ticket size come from the iDEX research synthesis.
  */
 
+import { isDemoActive, switchDemoScenario } from "./ws";
+
 export interface Mission {
   id: string;                  // backend scenario name (sent to POST /scenario/{id})
   short: string;
@@ -17,53 +19,53 @@ export interface Mission {
 export const MISSIONS: Mission[] = [
   {
     id: "border_strike",
-    short: "TRISHUL",
-    title: "Op Trishul · Border Strike Defence",
+    short: "C-UAS DEFENCE",
+    title: "Critical-Infrastructure C-UAS Defence",
     service: "IAF",
-    idex_ref: "ADITI 2.0 PS-11",
+    idex_ref: "C-UAS DEMO",
     ticket_inr_cr: 25,
     brief:
-      "Cross-LoC drone swarm targets LEH AIRBASE + Karu power station + DBO forward post. Scripted 90-second kill chain: Drishti detection → Prajna classification → Yajna auction → Sabha ROE → Vajra intercept. HVTs PROTECTED.",
+      "Hostile drone wave targets three critical-infrastructure assets (substation + data centre + water plant). Coordination kill chain: detection → classification → auction → ROE gate → interceptor. Assets PROTECTED.",
   },
   {
     id: "coverage",
     short: "CTR-SWARM",
-    title: "IAF Counter-Swarm Intercept",
+    title: "Counter-Swarm Intercept",
     service: "IAF",
-    idex_ref: "ADITI 2.0 PS-11",
+    idex_ref: "C-UAS DEMO",
     ticket_inr_cr: 25,
     brief:
-      "Hostile drones approach airfield from LoC at low altitude. Friendly swarm forms perimeter, ED-CBBA assigns targets, BFT authorizes engage.",
+      "Hostile drones approach a defended site at low altitude. Defender swarm forms a perimeter, ED-CBBA assigns targets, BFT consensus authorises engagement.",
   },
   {
     id: "formation_v",
-    short: "LAC-ISR",
-    title: "Army LAC Persistent ISR",
+    short: "PERSISTENT-ISR",
+    title: "Persistent ISR Patrol",
     service: "ARMY",
-    idex_ref: "DISC-14 PS-21",
+    idex_ref: "C-UAS DEMO",
     ticket_inr_cr: 11.5,
     brief:
-      "Heterogeneous swarm (scout + relay + striker) maintains video + comms across 30 km mountain terrain at 14-18 k ft, GPS-denied.",
+      "Heterogeneous swarm (scout + relay + striker) maintains video + comms across 30 km of terrain at altitude, GNSS-denied.",
   },
   {
     id: "flock",
-    short: "CARRIER-DEF",
-    title: "Navy Carrier Defense Mesh",
+    short: "PERIMETER-DEF",
+    title: "Maritime Perimeter Defence Mesh",
     service: "NAVY",
-    idex_ref: "DISC-14 PS-32",
+    idex_ref: "C-UAS DEMO",
     ticket_inr_cr: 1.5,
     brief:
-      "Ship-launched mesh forms inner+outer ring around carrier group. Saturation strike intercept + sonobuoy scouts.",
+      "Vessel-launched mesh forms inner + outer rings around a high-value platform. Saturation intercept + sonobuoy scouts.",
   },
   {
     id: "migration",
-    short: "MIGRATE-LAC",
-    title: "Governed Migration · Leh → LAC",
+    short: "MIGRATE",
+    title: "Governed Corridor Migration",
     service: "ARMY",
-    idex_ref: "DISC-14 PS-16",
+    idex_ref: "C-UAS DEMO",
     ticket_inr_cr: 11.5,
     brief:
-      "100 drones flow Leh airbase → Nubra forward post via Khardung La / Zoji La / Tanglang La. Per-corridor capacity, glacier-storm avoidance, governance-style load balancing.",
+      "100 drones flow from a rear node to a forward node via three corridors. Per-corridor capacity, storm avoidance, governance-style load balancing.",
   },
   {
     id: "hover",
@@ -80,7 +82,32 @@ export function getMission(id: string): Mission | undefined {
   return MISSIONS.find((m) => m.id === id);
 }
 
-export async function switchMission(id: string): Promise<void> {
+/** How a mission switch was actually served. */
+export type SwitchResult = "live" | "demo" | "unavailable";
+
+/**
+ * Switch the running scenario.
+ *
+ * Prefers the live backend. When there is none — the static Cloudflare Pages
+ * deployment, or a laptop with the bridge not running — falls back to the
+ * bundled recording for that mission. Never throws: the caller needs to know
+ * which of the three things happened so the UI can say so.
+ */
+export async function switchMission(id: string): Promise<SwitchResult> {
+  // Already replaying recordings: don't fire a POST that is guaranteed to fail
+  // (and, on an https page, to be blocked as mixed content).
+  if (isDemoActive()) {
+    return (await switchDemoScenario(id)) ? "demo" : "unavailable";
+  }
+
   const url = process.env.NEXT_PUBLIC_SWARM_HTTP_URL ?? "http://127.0.0.1:8765";
-  await fetch(`${url}/scenario/${id}?n=24&seed=42`, { method: "POST" });
+  try {
+    const res = await fetch(`${url}/scenario/${id}?n=24&seed=42`, { method: "POST" });
+    if (res.ok) return "live";
+    console.warn(`Backend refused scenario "${id}" (${res.status})`);
+  } catch {
+    // No backend reachable (offline static deploy, or blocked as mixed content
+    // when the page is https and the bridge is http). Fall through to the demo.
+  }
+  return (await switchDemoScenario(id)) ? "demo" : "unavailable";
 }
