@@ -54,7 +54,24 @@ export async function switchDemoScenario(scenario: string): Promise<boolean> {
   return demoController(scenario);
 }
 
+/** Last scenario seen on the wire, so a change can be detected on both the live
+ *  and the replay path. */
+let lastScenario: string | null = null;
+
 function ingestFrame(frame: SwarmFrame): void {
+  // A scenario change invalidates every derived store, no matter which path
+  // delivered it: a live POST /scenario/{id}, a bridge restarted out from under
+  // us, or a demo recording swap. Doing it here rather than in the switch
+  // handler is what keeps the two paths consistent.
+  //
+  // engagement.ts has its own reset heuristic, but it only fires when the NEW
+  // scenario produces events — so switching to a scenario with no hostiles
+  // (formation_v, migration, hover) would otherwise leave the previous
+  // mission's KIA list on screen indefinitely.
+  if (frame.scenario !== lastScenario) {
+    if (lastScenario !== null) resetDerivedStores();
+    lastScenario = frame.scenario;
+  }
   useSwarmStore.getState().setFrame(frame);
   useReplay.getState().push(frame);
   const pushIntent = useIntentHistory.getState().push;
@@ -72,6 +89,10 @@ export function connectSwarmWS(url: string): () => void {
   let demoActive = false;
   let demoScenario: string | null = null;
   let retries = 0;
+  /** Bumped on every scenario request so a slow fetch that lands after a newer
+   *  one cannot overwrite it. The recordings are 6-13 MB, so clicking two
+   *  missions in quick succession really can resolve out of order. */
+  let demoRequest = 0;
 
   /** 1.5 s while we still expect a backend; backs off to 30 s once the bundled
    *  demo is playing and there is nothing to wait for. */
@@ -88,6 +109,7 @@ export function connectSwarmWS(url: string): () => void {
   const playScenario = async (scenario: string): Promise<boolean> => {
     if (everConnected) return false;
     if (demoActive && demoScenario === scenario) return true; // already playing
+    const request = ++demoRequest;
     let frames: SwarmFrame[];
     try {
       const res = await fetch(demoUrl(scenario), { cache: "default" });
@@ -102,6 +124,10 @@ export function connectSwarmWS(url: string): () => void {
       return false;
     }
     if (!frames.length || everConnected) return false;
+    // A newer selection was made while this one was downloading — drop it, or
+    // the slower fetch would win and the operator would land on the mission
+    // they did not click last.
+    if (request !== demoRequest) return false;
 
     // Only tear down the running loop once the new recording is in hand.
     if (demoPlaybackTimer) {
@@ -109,6 +135,7 @@ export function connectSwarmWS(url: string): () => void {
       demoPlaybackTimer = null;
     }
     resetDerivedStores();
+    lastScenario = scenario; // the guard in ingestFrame has nothing left to do
 
     demoActive = true;
     demoScenario = scenario;
