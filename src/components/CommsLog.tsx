@@ -25,7 +25,7 @@ export function CommsLog() {
   const tail = useMemo(() => messages.slice(-40).reverse(), [messages]);
 
   return (
-    <section className="pointer-events-auto absolute bottom-0 left-72 right-[26rem] z-10 hidden md:flex h-32 flex-col border-t border-[var(--color-line)] bg-[var(--color-canvas)]/92 backdrop-blur-sm" data-mobile-panel="wirelog">
+    <section className="pointer-events-auto absolute bottom-0 left-72 right-[26rem] z-10 hidden md:flex h-32 flex-col border-t border-[var(--color-line)] bg-[var(--color-canvas)]/92 backdrop-blur-sm" data-mobile-panel="wirelog" data-explain="wirelog">
       <header className="flex items-baseline justify-between border-b border-[var(--color-line)] px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em]">
         <span className="text-[var(--color-text-vdim)]">Wire log · live</span>
         <div className="flex items-center gap-3 text-[var(--color-text-dim)]">

@@ -145,6 +145,11 @@ export function connectSwarmWS(url: string): () => void {
     let i = 0;
     const tick = () => {
       if (everConnected) return; // live data pre-empted the demo
+      // Recordings run to mission completion and then hold on the finished
+      // state for a beat. On wrap, clear the derived stores so the next pass
+      // starts from a clean board instead of replaying on top of the last
+      // run's engagement log and a still-green MISSION COMPLETE.
+      if (i > 0 && i % frames.length === 0) resetDerivedStores();
       ingestFrame(frames[i % frames.length]);
       i += 1;
       demoPlaybackTimer = window.setTimeout(tick, DEMO_FRAME_MS);
