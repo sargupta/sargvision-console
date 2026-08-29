@@ -7,6 +7,7 @@ import { BFTAlert } from "@/components/BFTAlert";
 import { CommsLog } from "@/components/CommsLog";
 import { DegradedOpsBanner } from "@/components/DegradedOpsBanner";
 import { DoctrinePanel } from "@/components/DoctrinePanel";
+import { GuidePanel } from "@/components/GuidePanel";
 import { MissionBriefing } from "@/components/MissionBriefing";
 import { MissionObjectives } from "@/components/MissionObjectives";
 import { MobileShell } from "@/components/MobileShell";
@@ -83,6 +84,7 @@ export default function ConsolePage() {
       <MissionBriefing />
       <PostMortem />
       <DoctrinePanel />
+      <GuidePanel />
     </main>
   );
 }

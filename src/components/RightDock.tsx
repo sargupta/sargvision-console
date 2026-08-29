@@ -36,12 +36,17 @@ export function RightDock({
       data-mobile-panel="dock"
     >
       {/* Top: mission objectives. Empty when scenario has no defined brief. */}
-      <div className="shrink-0 empty:hidden border-b border-[var(--color-line)] empty:border-b-0">
+      <div
+        data-explain="mission"
+        className="shrink-0 empty:hidden border-b border-[var(--color-line)] empty:border-b-0"
+      >
         {mission}
       </div>
 
       {/* Middle: doctrine tabs panel — takes the rest of the column. */}
-      <div className="flex-1 min-h-0 overflow-hidden">{doctrine}</div>
+      <div data-explain="doctrine" className="flex-1 min-h-0 overflow-hidden">
+        {doctrine}
+      </div>
 
       {/* Bottom: BFT toast region — slides in only on active consensus votes. */}
       <div className="shrink-0 empty:hidden border-t border-[var(--color-line)] empty:border-t-0">

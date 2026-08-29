@@ -100,3 +100,22 @@ body {
 }
 
 html { color-scheme: dark; }
+
+/* EXPLAIN mode — ring the region of the console the open guide topic describes.
+   Applied/removed by GuidePanel via a `data-explain` lookup. */
+.explain-spotlight {
+  position: relative;
+  outline: 1px solid var(--color-friend);
+  outline-offset: -1px;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-friend) 22%, transparent);
+  animation: explain-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes explain-pulse {
+  0%, 100% { box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-friend) 22%, transparent); }
+  50%      { box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-friend) 10%, transparent); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .explain-spotlight { animation: none; }
+}
