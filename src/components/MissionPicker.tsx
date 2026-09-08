@@ -102,11 +102,7 @@ export function MissionPicker() {
                   <div className="mt-0.5 text-[11px] leading-snug text-[var(--color-text-dim)]">
                     {m.brief}
                   </div>
-                  {m.ticket_inr_cr > 0 && (
-                    <div className="mt-1 inline-block rounded-[2px] border border-[var(--color-status-warn)]/40 px-1.5 py-px font-mono text-[9px] uppercase tracking-[0.18em] text-[var(--color-status-warn)]">
-                      ₹{m.ticket_inr_cr} cr ticket
-                    </div>
-                  )}
+
                 </div>
               </button>
             );

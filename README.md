@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Next.js](https://img.shields.io/badge/next.js-16-black)](https://nextjs.org)
 
-> *Anduril Lattice-grade operator console for the SARGVISION Swarm command system.*
+> *Operator console for the SARGVISION Swarm coordination system.*
 > Map, wire log, kill chain, BFT votes, replay scrubber, and post-mortem in one screen.
 
 ## What this is

@@ -4,7 +4,7 @@
  *
  * Renders, conditional on `frame.trishul` being present:
  *
- *   LoC line       — dashed red PathLayer across the north
+ *   Sector line    — dashed red PathLayer across the north
  *   HVT shields    — IconLayer with status-coloured shield glyphs + name labels
  *   HVT impact rings — PolygonLayer showing the impact radius
  *   Threat arrows  — LineLayer hostile-spawn → assigned HVT (faint amber)
@@ -33,7 +33,7 @@ function shieldIcon(kind: HVT["kind"], status: HVTStatus): {
   // SVG shield with kind label baked in. Drawn at 96×96 nominal so PNG-ish
   // rasterisation is sharp on retina.
   const label =
-    kind === "military" ? "MIL" : kind === "energy" ? "ENR" : "CMD";
+    kind === "energy" ? "PWR" : kind === "data" ? "DAT" : "H2O";
   const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'>
     <defs><filter id='g' x='-50%' y='-50%' width='200%' height='200%'>
       <feGaussianBlur stdDeviation='2.5'/></filter></defs>
@@ -56,7 +56,7 @@ export function trishulLayers(trishul: TrishulSummary | null | undefined): Layer
   if (!trishul) return [];
   const layers: Layer[] = [];
 
-  // ── LoC line ─────────────────────────────────────────────────────────
+  // ── Sector boundary ──────────────────────────────────────────────────
   if (trishul.loc_line && trishul.loc_line.length >= 2) {
     const path = trishul.loc_line.map(([lon, lat]) => [lon, lat, 0]) as [
       number,
@@ -78,7 +78,7 @@ export function trishulLayers(trishul: TrishulSummary | null | undefined): Layer
         extensions: [],
       }) as unknown as Layer,
     );
-    // LoC text label sitting just above the line midpoint.
+    // Boundary label sitting just above the line midpoint.
     const mid = trishul.loc_line[Math.floor(trishul.loc_line.length / 2)];
     layers.push(
       new TextLayer({
@@ -86,7 +86,7 @@ export function trishulLayers(trishul: TrishulSummary | null | undefined): Layer
         data: [{ pos: [mid[0], mid[1] + 0.0035] }],
         parameters: { depthTest: false },
         getPosition: (d: { pos: [number, number] }) => d.pos,
-        getText: () => "// LoC · LINE OF CONTROL",
+        getText: () => "// SECTOR BOUNDARY",
         getColor: [255, 77, 94, 230],
         getSize: 11,
         fontFamily: "JetBrains Mono, ui-monospace, monospace",
