@@ -68,7 +68,7 @@ export function MissionBriefing() {
             {mission.title}
           </div>
           <div className="mt-1 font-mono text-[11px] uppercase tracking-[0.22em] text-[var(--color-friend)]">
-            {mission.service} · ₹{mission.ticket_inr_cr} cr ticket · CLASSIFIED // OFFICIAL USE
+            {mission.service} · {mission.idex_ref}
           </div>
 
           <p className="mt-4 max-w-prose text-[13px] leading-relaxed text-[var(--color-text-dim)]">
@@ -78,7 +78,7 @@ export function MissionBriefing() {
           <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-1.5 font-mono text-[10px] uppercase tracking-[0.18em]">
             <div className="flex items-baseline justify-between border-b border-[var(--color-line)]/60 pb-1">
               <dt className="text-[var(--color-text-vdim)]">Theatre</dt>
-              <dd className="text-[var(--color-text)]">LEH · LADAKH</dd>
+              <dd className="text-[var(--color-text)]">DEFENDED SECTOR</dd>
             </div>
             <div className="flex items-baseline justify-between border-b border-[var(--color-line)]/60 pb-1">
               <dt className="text-[var(--color-text-vdim)]">Force</dt>

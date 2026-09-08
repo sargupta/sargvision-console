@@ -185,7 +185,9 @@ export interface ChanakyaSummary {
 
 // ── Operation Trishul: border-strike HVT defence ──────────────────────
 export type HVTStatus = "PROTECTED" | "UNDER_ATTACK" | "STRUCK";
-export type HVTKind = "military" | "energy" | "command";
+// Civilian critical-infrastructure asset classes. These are defined civilian
+// at source in the scenario, not renamed after the fact.
+export type HVTKind = "energy" | "data" | "water";
 
 export interface HVT {
   id: string;
@@ -219,7 +221,7 @@ export interface TrishulAxisArrow {
 
 export interface TrishulSummary {
   hvts: HVT[];
-  loc_line: [number, number][]; // polyline of [lon, lat] points across the LoC
+  loc_line: [number, number][]; // polyline of [lon, lat] points marking the sector boundary
   axis_arrows: TrishulAxisArrow[];
   phase: TrishulPhase;
   all_protected: boolean;

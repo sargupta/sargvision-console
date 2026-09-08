@@ -14,7 +14,7 @@
  *  child renders inline within this stack via React composition, so there's
  *  zero chance of overlap with the map centre.
  *
- *  The Anduril Lattice rule: information density on the rails, clean canvas
+ *  Layout rule: information density on the rails, clean canvas
  *  in the middle.
  */
 

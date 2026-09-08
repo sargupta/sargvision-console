@@ -59,7 +59,7 @@ export const DOCTRINES: Doctrine[] = [
     citation: "Brin & Page 1998 + loyalty-weighted variant in comms/trust.py",
     surfaced_in: "ShieldPanel · kill-thresh readout",
     notes:
-      "Loyalty propagates over the comm graph via damped iteration. A loyal drone neighboring spoofed ones loses some trust by proximity. Below 0.25 → kill-switched.",
+      "Loyalty propagates over the comm graph via damped iteration. A loyal drone neighboring spoofed ones loses some trust by proximity. Below the kill threshold → isolated from tasking and voting.",
   },
   {
     sanskrit: "प्रज्ञा",
@@ -91,7 +91,7 @@ export const DOCTRINES: Doctrine[] = [
     meaning: "renunciation — withdrawal of a corrupted limb to save the body",
     technical: "Kill-switch on sub-threshold trust (SHIELD layer 5)",
     layer: "shield",
-    math: "ifᵢ ∈ kill-switched ⟺ Tᵢ < 0.25     ⇒ votes ignored, bids zeroed",
+    math: "ifᵢ ∈ isolated ⟺ Tᵢ < T_kill     ⇒ votes ignored, bids zeroed",
     citation: "own; Byzantine threshold from PBFT literature",
     surfaced_in: "ShieldPanel · KILL-SW counter · INJECT HIJACK demo",
     notes:
@@ -145,11 +145,11 @@ export const DOCTRINES: Doctrine[] = [
     meaning: "assembly of seven — vedic council of elders",
     technical: "SwarmRaft K=7 BFT committee",
     layer: "consensus",
-    math: "decision = ⌈²⁄₃ · K⌉ quorum     tolerates ⌊(K-1)/2⌋ = 3 byzantine",
-    citation: "Ongaro & Ousterhout 2014 + Skoltech BFT for GNSS dropout (arXiv 2508.00622)",
+    math: "decision = ⌈²⁄₃ · K⌉ quorum     K ≥ 3f+1 ⇒ f = 2 byzantine",
+    citation: "Castro & Liskov 1999 (PBFT) + Skoltech BFT for GNSS dropout (arXiv 2508.00622)",
     surfaced_in: "BFTAlert modal · top-center on engage/replan",
     notes:
-      "Seven-member committee on mission state. Irreversible actions (engage / RTL / abort) require ⅔ quorum. Tolerates up to 3 byzantine (e.g. GNSS-spoofed) drones.",
+      "Seven-member committee on mission state. Irreversible actions require a ⅔ quorum. Byzantine agreement needs K ≥ 3f+1, so K=7 tolerates f=2 — not 3, which is the crash-fault bound. Vote CONTENT is still stubbed: honest members do not yet evaluate the proposal.",
   },
 
   // ── Comms ──

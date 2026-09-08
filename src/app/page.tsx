@@ -23,7 +23,7 @@ import { connectSwarmWS } from "@/lib/ws";
 const WS_URL = process.env.NEXT_PUBLIC_SWARM_WS_URL ?? "ws://127.0.0.1:8765/swarm";
 
 /**
- * Console page layout — Anduril Lattice-grade institutional grid.
+ * Console page layout — dense institutional grid.
  *
  *   ┌──────────────── TopBar (h-12) ─────────────────────┐
  *   │ AssetRail │           CLEAN MAP               │ RightDock │
